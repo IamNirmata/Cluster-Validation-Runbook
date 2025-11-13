@@ -83,15 +83,15 @@ LOG_FILE="$LOG_DIR/latency_${TIMESTAMP}.txt"
 echo ""
 echo "Creating latency summary table at $LOG_FILE..."
 
+# --- MODIFIED TABLE GENERATION ---
 # Create header
-printf "| %-30s | %-15s |\n" "Test Configuration" "Avg Latency" > $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Status" "Ring" "Tree" > $LOG_FILE
 # Create separator
-printf "| %-30s | %-15s |\n" "------------------------------" "---------------" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "----------------" "---------------" "---------------" >> $LOG_FILE
 # Add data
-printf "| %-30s | %-15s |\n" "SHARP Enabled (Tree)" "$LATENCY_T1" >> $LOG_FILE
-printf "| %-30s | %-15s |\n" "SHARP Disabled (Tree)" "$LATENCY_T2" >> $LOG_FILE
-printf "| %-30s | %-15s |\n" "SHARP Enabled (Ring)" "$LATENCY_T3" >> $LOG_FILE
-printf "| %-30s | %-15s |\n" "SHARP Disabled (Ring)" "$LATENCY_T4" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Enabled" "$LATENCY_T3" "$LATENCY_T1" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Disabled" "$LATENCY_T4" "$LATENCY_T2" >> $LOG_FILE
+# --- END MODIFICATION ---
 
 echo ""
 echo "--- Latency Summary Table ---"
