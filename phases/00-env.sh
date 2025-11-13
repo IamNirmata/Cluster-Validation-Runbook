@@ -15,9 +15,3 @@ for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done > /opt/hostfi
 for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 
 
-
-# paths 
-export logdir="/data/cluster_validation/"
-
-# export variables
-export logstatus=1
