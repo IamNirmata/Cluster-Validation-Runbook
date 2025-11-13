@@ -81,6 +81,8 @@ echo "=========================================================="
 
 # --- Generate Table ---
 LOG_FILE="$LOG_DIR/latency_${TIMESTAMP}.txt"
+# Create the log file
+touch "$LOG_FILE"
 echo ""
 echo "Creating latency summary table at $LOG_FILE..."
 
