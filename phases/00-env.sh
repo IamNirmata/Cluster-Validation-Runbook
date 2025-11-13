@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-# Ensure sudo exists before using it for the remaining installs
-if ! command -v sudo >/dev/null 2>&1; then
-	apt-get update
-	apt-get install -y sudo
-fi
-
-
-# Install dependencies
-sudo apt-get update
-sudo apt-get install -y iputils-ping
+##-------------------------- SETUP ENVIRONMENT --------------------------
+set -eo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y --no-install-recommends sudo openssh-server openssh-client ca-certificates \
+ibverbs-utils rdmacm-utils perftest infiniband-diags iputils-ping
 
 
+## setup hostfile
+mkdir -p /run/sshd && ssh-keygen -A
+/usr/sbin/sshd -D -e &
+for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done > /opt/hostfile
+for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 
 
 
 # paths 
-export log_dir="/data/logs"
+export logdir="/data/cluster_validation/"
 
 # export variables
 export logstatus=1
