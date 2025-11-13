@@ -23,25 +23,11 @@ The manifest launches one **server** pod and two **client** pods. The server pod
 
 Each script writes a timestamped summary table under `./allreduce_logs` (inside the cloned repo directory, i.e., `/opt/Cluster-Validation-Runbook/scalability/allreduce_logs`).
 
-## 3. Monitor Progress
 
-```bash
-kubectl get vcjob -n gcr-admin
-kubectl get pods -n gcr-admin -l app=allreduce-mpi
-kubectl logs -n gcr-admin hari-gcr-cluster-validation-scalability-<suffix>-server-0
-```
-
-Use `kubectl exec -it <pod> -- /bin/bash` if interactive debugging is required.
-
-## 4. Collect Results
+## 3. Collect Results
 
 - Download the contents of `/opt/Cluster-Validation-Runbook/scalability/allreduce_logs` from the server pod.
+- Scalability test results are stored in '/opt/Cluster-Validation-Runbook/scalability/logs'.
 - Each test produces a Markdown-style table summarizing the key metrics (latency or bus bandwidth).
+- please provide STDOUT/STDERR log also during the cluster handoff.
 
-## 5. Tear Down
-
-```bash
-kubectl delete -f ymls/scalability.yml
-```
-
-Clean up any temporary secrets or PVC snapshots used for the run.
