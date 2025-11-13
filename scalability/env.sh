@@ -31,6 +31,14 @@ echo "--- Hostfile (/opt/hostfile) ---"
 cat /opt/hostfile
 echo "--------------------------------"
 
+
+#logdirectory
+export testdir="/opt/Cluster-Validation-Runbook/scalability/logs"
+mkdir -p "$testdir"
+export LOG_DIR="$testdir"
+
+
+
 # 5. Set Master Address (Using IP to avoid DNS flakes)
 # This gets exported into the shell environment
 export MASTER_ADDR=$(hostname -i)
