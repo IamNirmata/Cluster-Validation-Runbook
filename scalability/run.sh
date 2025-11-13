@@ -1,5 +1,6 @@
 #!/bin/bash
 
+testdir=/opt/Cluster-Validation-Runbook/scalability
 # --- Configuration ---
 # 1. Set log directory.
 #    Uses the $testdir environment variable if it's set.
@@ -45,3 +46,18 @@ run_test "bandwidth-sharp-disabled.sh" "bandwidth_sharp_disabled"
 run_test "bandwidth-sharp-enabled.sh"  "bandwidth_sharp_enabled"
 
 echo "--- All tests complete. ---"
+
+
+echo "--- Displaying all log files ---"
+echo ""
+
+# Find all log files with the current timestamp and display them
+for log_file in "$LOG_DIR"/*_${TIMESTAMP}.log; do
+    if [ -f "$log_file" ]; then
+        echo "=== Contents of $(basename "$log_file") ==="
+        cat "$log_file"
+        echo ""
+        echo "=== End of $(basename "$log_file") ==="
+        echo ""
+    fi
+done
