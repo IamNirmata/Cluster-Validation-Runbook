@@ -2,6 +2,13 @@
 set -eo pipefail
 HOSTFILE="/opt/hostfile"
 NUM_NODES=$(wc -l < $HOSTFILE)
+testdir=/opt/Cluster-Validation-Runbook/scalability
+# Create testdir if it doesn't exist
+if [ ! -d "$testdir" ]; then
+    echo "Creating directory: $testdir"
+    mkdir -p "$testdir"
+fi
+
 LOG_DIR=${testdir:-"./allreduce_logs"} # Inherit LOG_DIR from run.sh or default
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S") # Use a timestamp for the txt file
 
