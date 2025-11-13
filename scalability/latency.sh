@@ -2,13 +2,6 @@
 set -eo pipefail
 HOSTFILE="/opt/hostfile"
 NUM_NODES=$(wc -l < $HOSTFILE)
-testdir=/opt/Cluster-Validation-Runbook/scalability
-# Create testdir if it doesn't exist
-if [ ! -d "$testdir" ]; then
-    echo "Creating directory: $testdir"
-    mkdir -p "$testdir"
-fi
-
 LOG_DIR=${testdir:-"./allreduce_logs"} # Inherit LOG_DIR from run.sh or default
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S") # Use a timestamp for the txt file
 
@@ -34,20 +27,24 @@ export NCCL_DEBUG=INFO # Set to WARN to reduce log spam, INFO for details
 # --- Function to run test and extract latency ---
 run_and_parse() {
   local test_name=$1
-  echo ""
-  echo "--- RUNNING: $test_name ---"
+  # --- MODIFICATION: Print all status messages to stderr (>&2) ---
+  echo "" >&2
+  echo "--- RUNNING: $test_name ---" >&2
   
-  # Run command, tee output to stdout and a temp file
+  # Run command, tee output to stderr.
   # Grep for Avg Latency, awk to get the value (col 3) and unit (col 4)
+  # The 'local result=' line only captures stdout from the pipe.
   local result=$($MPI_CMD 2>&1 | tee /dev/stderr | grep "Avg Latency" | awk '{print $3 " " $4}')
   
   if [ -z "$result" ]; then
-    echo "ERROR: Test '$test_name' failed to produce latency output."
+    echo "ERROR: Test '$test_name' failed to produce latency output." >&2
     result="Failed"
   fi
   
-  echo "Result: $result"
-  echo "$result" # Return the result
+  echo "Result: $result" >&2
+  # --- END MODIFICATION ---
+
+  echo "$result" # This is the *only* line that goes to stdout and is captured
 }
 
 # --- TEST 1: SHARP Enabled + Tree Algorithm ---
@@ -80,9 +77,9 @@ echo "LATENCY TEST MATRIX COMPLETE"
 echo "=========================================================="
 
 # --- Generate Table ---
+# Make sure LOG_DIR exists (it should be created by run.sh, but good to check)
+mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/latency_${TIMESTAMP}.txt"
-# Create the log file
-touch "$LOG_FILE"
 echo ""
 echo "Creating latency summary table at $LOG_FILE..."
 
