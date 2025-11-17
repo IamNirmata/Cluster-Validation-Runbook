@@ -11,6 +11,7 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
 - Dmesg logs and GPU utilization logs (nvidia-smi logs if needed) from all nodes during the test runs.
 - Environment details:
   - Cluster configuration (number of nodes, Hardware details).
+  - List "env" before tests.
   - Software stack details (OS version, driver versions, CUDA version, NCCL version, MPI version).
   - Docker image used for the tests.
   - Any custom configurations or optimizations applied.
@@ -52,7 +53,6 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
             | 10 nodes    | 778.64 GB/s   | 292.09 us   | 100%             |
             | 20 nodes    | 667.16 GB/s   | 723.20 us   | 85.7%            |
             | 30 nodes    | 357.68 GB/s   | 977.01 us   | 46.0%            |
-
 
 ### 3. All-Pair Bandwidth Test Results
 - Complete logs for all pairwise combinations tested ($\frac{n(n-1)}{2}$))
