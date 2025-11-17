@@ -2,7 +2,7 @@
 
 ### Overview
 
-When handing over the application / cluster level validation results, please ensure the following items are included to facilitate smooth review and analysis:
+Cluster-Validation-Runbook covers the cluster level validation tests ( application level tests only , Lab GPU team will provide hardware/k8s tests ) for GPU clusters. The three main tests included are Deep Learning Unit Test, Scalability Tests, and All-Pair Bandwidth Tests.
 
 ### General Requirements and deliverables for all Tests
 - All tests executed on cluster level (all nodes involved).
