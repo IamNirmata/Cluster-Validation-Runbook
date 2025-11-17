@@ -6,11 +6,13 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
 
 ### General Requirements and deliverables for all Tests
 - All tests executed on cluster level (all nodes involved).
+- All nodes should have the same software stack and configurations.
 - Complete logs for all tests executed, including STDOUT and STDERR.
 - Dmesg logs and GPU utilization logs (nvidia-smi logs if needed) from all nodes during the test runs.
 - Environment details:
-  - Cluster configuration (number of nodes, GPU types, interconnects).
+  - Cluster configuration (number of nodes, Hardware details).
   - Software stack details (OS version, driver versions, CUDA version, NCCL version, MPI version).
+  - Image used for the tests.
   - Any custom configurations or optimizations applied.
 
 ### 1. Deep Learning Unit Test Results
@@ -29,7 +31,7 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
         - Latency matrix should include SHARP vs. non-SHARP, Ring vs. Tree configurations.
         - Example latency summary table:
 
-        | latency statistics | Ring | Tree |
+        | latency statistics | time taken(Ring) |  time taken(Tree) |
         |--------------|------|------|
         | SHARP Enabled | 879.82 us | 934.22 us |
         | SHARP Disabled | 867.65 us | 1078.09 us |
@@ -38,7 +40,7 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
   q      - Bandwidth matrix should include SHARP vs. non-SHARP, Ring vs. Tree configurations.
         - Example bandwidth summary table:
 
-            | bandwidth statistics | Ring | Tree |
+            | bandwidth statistics | bus bandwidth (Ring) | bus bandwidth (Tree) |
             |---------------------|------|------|
             | SHARP Enabled | 350 GB/s | 350 GB/s |
             | SHARP Disabled | 350 GB/s | 350 GB/s |
