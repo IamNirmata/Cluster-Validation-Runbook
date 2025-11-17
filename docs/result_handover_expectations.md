@@ -12,7 +12,7 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
 - Environment details:
   - Cluster configuration (number of nodes, Hardware details).
   - Software stack details (OS version, driver versions, CUDA version, NCCL version, MPI version).
-  - Image used for the tests.
+  - Docker image used for the tests.
   - Any custom configurations or optimizations applied.
 
 ### 1. Deep Learning Unit Test Results
