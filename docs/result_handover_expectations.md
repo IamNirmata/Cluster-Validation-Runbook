@@ -16,14 +16,13 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
   - Any custom configurations or optimizations applied.
 
 ### 1. Deep Learning Unit Test Results
-- Please provide
-    - Test results summary table:
+- Test results summary table:
 
-| Node ID | Test Result | Details | Affected components |
-|---------|-------------|---------|---------------------|
-| node-001 | Pass | All tests completed successfully | None |
-| node-002 | Fail | Numerical instability detected | GPU 0, conv3d layer |
-| node-003 | Pass | All tests completed successfully | None |
+    | Node ID | Test Result | Details | Affected components |
+    |---------|-------------|---------|---------------------|
+    | node-001 | Pass | All tests completed successfully | None |
+    | node-002 | Fail | Numerical instability detected | GPU 0, conv3d layer |
+    | node-003 | Pass | All tests completed successfully | None |
 
 ### 2. Scalability Test Results
 - 3 Sets of tests should be included:
@@ -37,7 +36,7 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
         | SHARP Disabled | 867.65 us | 1078.09 us |
 
   2. Bandwidth Test Results
-  q      - Bandwidth matrix should include SHARP vs. non-SHARP, Ring vs. Tree configurations.
+        - Bandwidth matrix should include SHARP vs. non-SHARP, Ring vs. Tree configurations.
         - Example bandwidth summary table:
 
             | bandwidth statistics | bus bandwidth (Ring) | bus bandwidth (Tree) |
