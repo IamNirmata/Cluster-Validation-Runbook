@@ -1,0 +1,89 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  generateName: hari-gcr-cluster-validation-dltest-
+  namespace: gcr-admin
+spec:
+  queue: gcr-admin
+  minAvailable: 1 # for gang scheduling requires minAvailable to be set to the total number of tasks
+  plugins:
+    ssh: []   # passwordless SSH + host files under /etc/volcano
+    svc: []   # creates per-task headless Services when containerPorts are present
+    env: []   # VC_* envs
+  tasks:
+    - name: server
+      replicas: 3
+      template:
+        metadata:
+          labels:
+            app: allpair-mpi
+            role: server
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm # use /dev/shm for inter-process communication
+              emptyDir:
+                medium: Memory
+                sizeLimit: 100Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-local-gcr-admin-01
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: allpair-mpi
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: server
+              image: nvcr.io/nvidia/pytorch:25.06-py3 # matches the baseline of dltest
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: data
+                  mountPath: /data
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash","-lc"]
+              args:
+                - |
+                  #1
+                  echo "Starting server..."
+                  echo " the node is $gcrnode"
+                  #distrbuted_training_tools
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  source /opt/Cluster-Validation-Runbook/phases/00-env.sh
+                  bash /opt/Cluster-Validation-Runbook/phases/01-pvc.sh
+                  #2
+                  #deeplearning_unit_test
+                  git clone --branch bonete https://github.com/IamNirmata/deeplearning_unit_test.git /opt/deeplearning_unit_test
+                  cd /opt/deeplearning_unit_test
+                  bash run_b200.sh 8
+                  sleep 36000
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"
+ 
