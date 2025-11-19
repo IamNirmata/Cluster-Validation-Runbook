@@ -10,10 +10,10 @@ Cluster-Validation-Runbook covers the cluster level validation tests ( applicati
 - Complete logs for all tests executed, including STDOUT and STDERR.
 - Dmesg logs and GPU utilization logs (nvidia-smi logs if needed) from all nodes during the test runs.
 - Environment details:
-  - Cluster configuration (number of nodes, Hardware details).
+  - Cluster configuration (node list with IP addresses/hostnames, Hardware details).
   - List "env" before tests.
   - Software stack details (OS version, driver versions, CUDA version, NCCL version, MPI version).
-  - Docker image used for the tests.
+  - Docker image used for the tests (with tag) - Please use nvcr.io/nvidia/pytorch:25.06-py3
   - Any custom configurations or optimizations applied.
 
 ### 1. Deep Learning Unit Test Results
