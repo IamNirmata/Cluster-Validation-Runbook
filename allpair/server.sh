@@ -168,6 +168,9 @@ SSHD_PID=$!
 rm -f "$CONTROL_FIFO"
 mkfifo "$CONTROL_FIFO"
 
+
+
+# Generate Hostfile
 for host in ${VC_SERVER_HOSTS//,/ }; do
   echo "$host slots=8"
 done > /opt/hostfile
