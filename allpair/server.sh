@@ -6,6 +6,8 @@ CONTROL_FIFO="/tmp/allpair_control"
 SSHD_PID=""
 signal_sent=0
 
+
+#ssh wait for clients to be reachable via ssh
 wait_for_clients() {
   if [[ -z "${VC_CLIENT_HOSTS:-}" ]]; then
     return 0
