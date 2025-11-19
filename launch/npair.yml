@@ -64,20 +64,7 @@ spec:
                 - |
                   set -eo pipefail
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
-                  export DEBIAN_FRONTEND=noninteractive
-                  apt-get update -y
-                  apt-get install -y --no-install-recommends openssh-server openssh-client ca-certificates \
-                    ibverbs-utils rdmacm-utils perftest infiniband-diags
-                  mkdir -p /run/sshd && ssh-keygen -A
-                  /usr/sbin/sshd -D -e &
-                  for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done > /opt/hostfile
-                  for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
-                  git clone https://github.com/IamNirmata/Distrbuted_training_tools.git /opt/Distrbuted_training_tools
-                  echo "#########################Hostfile#########################"
-                  cat /opt/hostfile
-                  echo "##########################################################"
-                  echo "Server pod sleeping; exec into it to run allpair.sh manually."
-                  tail -f /dev/null
+                  bash /opt/Cluster-Validation-Runbook/allpair/server.sh
               resources:
                 requests:
                   nvidia.com/gpu: "8"

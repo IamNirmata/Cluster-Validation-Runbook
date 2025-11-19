@@ -140,8 +140,12 @@ export HOSTFILE=/opt/hostfile
 export LOGDIR=${LOGDIR:-/opt/allpair-logs}
 mkdir -p "$LOGDIR"
 
-echo "Automatic allpair.sh launch disabled. Exec into this pod to run: bash $SCRIPT_DIR/allpair.sh"
-echo "Sleeping indefinitely (tail -f /dev/null) so the container stays running."
-tail -f /dev/null &
-sleep_pid=$!
-wait "$sleep_pid"
+echo "Starting automatic allpair run via $SCRIPT_DIR/allpair.sh"
+if bash "$SCRIPT_DIR/allpair.sh"; then
+  print_log_summary
+else
+  status=$?
+  echo "allpair.sh exited with status $status" >&2
+  print_log_summary
+  exit "$status"
+fi
