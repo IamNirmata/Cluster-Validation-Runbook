@@ -2,7 +2,6 @@ import torch.distributed as dist
 import os
 import time
 import torch
-import socket
 
 # Retrieve environment variables for distributed training configuration        
 local_world_size = int(os.environ.get("LOCAL_WORLD", 1))     
@@ -36,9 +35,7 @@ for _ in range(ITERATIONS):
 torch.cuda.synchronize()
 duration = (time.perf_counter() - pre) / ITERATIONS
 busbw = ((size/g) / (duration)) *(2 * (world_size - 1) / world_size)
-gcrnode = os.environ.get("gcrnode", "unknown_node")
-hostname = socket.gethostname()
-print(f"host: {hostname} gcrnode: {gcrnode} latency: {duration} busbw: {busbw}")
+print(f"latency: {duration} busbw: {busbw}")
 
 
 dist.destroy_process_group()
