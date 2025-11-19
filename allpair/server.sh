@@ -72,11 +72,24 @@ print_log_summary() {
 # Generate CSV report from logs
 generate_csv_report() {
   local csv_file="${LOGDIR}/results.csv"
+  local node_map_file="/opt/node_map.csv"
   echo "pair 1, pair 1 gcrnode, pair 2, pair 2 gcrnode, latency, busbw" > "$csv_file"
 
   if [[ ! -d "$LOGDIR" ]]; then
     echo "No log directory $LOGDIR found."
     return
+  fi
+  
+  # Read node map into associative array
+  declare -A node_map
+  if [[ -f "$node_map_file" ]]; then
+      while IFS=, read -r pod gcrnode; do
+          if [[ "$pod" != "pod_name" ]]; then
+              node_map["$pod"]="$gcrnode"
+          fi
+      done < "$node_map_file"
+  else
+      echo "WARN: $node_map_file not found. GCR node names will be unknown."
   fi
 
   mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
@@ -98,15 +111,9 @@ generate_csv_report() {
     # Calculate average busbw
     local avg_busbw=$(grep "busbw:" "$log_file" | awk -F'busbw: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
     
-    # Extract gcrnode names
-    local short_node1=$(echo "$node1" | cut -d. -f1)
-    local short_node2=$(echo "$node2" | cut -d. -f1)
-
-    local gcrnode1=$(grep "host: $short_node1" "$log_file" | head -n 1 | awk -F'gcrnode: ' '{print $2}' | awk '{print $1}')
-    local gcrnode2=$(grep "host: $short_node2" "$log_file" | head -n 1 | awk -F'gcrnode: ' '{print $2}' | awk '{print $1}')
-    
-    if [[ -z "$gcrnode1" ]]; then gcrnode1="unknown"; fi
-    if [[ -z "$gcrnode2" ]]; then gcrnode2="unknown"; fi
+    # Lookup gcrnode names
+    local gcrnode1="${node_map[$node1]:-unknown}"
+    local gcrnode2="${node_map[$node2]:-unknown}"
 
     echo "$node1, $gcrnode1, $node2, $gcrnode2, $avg_latency, $avg_busbw" >> "$csv_file"
   done
