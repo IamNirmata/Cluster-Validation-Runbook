@@ -247,7 +247,13 @@ cat /opt/hostfile
 echo "##########################################################"
 
 export HOSTFILE=/opt/hostfile
-export LOGDIR=${LOGDIR:-/opt/allpair-logs}
+
+# Use persistent storage for logs if available, to support checkpointing/resuming
+if [[ -d "/data" ]]; then
+    export LOGDIR=${LOGDIR:-/data/allpair-logs}
+else
+    export LOGDIR=${LOGDIR:-/opt/allpair-logs}
+fi
 mkdir -p "$LOGDIR"
 
 wait_for_clients
