@@ -147,7 +147,7 @@ trap 'code=$?; trap - EXIT; cleanup "$code"; exit "$code"' EXIT
 
 
 
-
+# Set up environment
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update -y
