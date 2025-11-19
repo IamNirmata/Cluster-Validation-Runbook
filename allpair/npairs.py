@@ -2,6 +2,7 @@ import torch.distributed as dist
 import os
 import time
 import torch
+import socket
 
 # Retrieve environment variables for distributed training configuration        
 local_world_size = int(os.environ.get("LOCAL_WORLD", 1))     
