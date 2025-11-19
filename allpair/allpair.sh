@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap 'echo "ERROR: allpair.sh failed at line $LINENO" >&2' ERR
 
 if [[ "${ALLPAIR_DEBUG:-0}" == "1" ]]; then
   set -x
@@ -11,6 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_HOSTFILE="$SCRIPT_DIR/test_files/hostfile"
 DEFAULT_GEN_SCRIPT="$SCRIPT_DIR/generate_permutations.py"
 DEFAULT_LOGDIR="$SCRIPT_DIR/logs"
+DEFAULT_NET_IFACE="${NET_IFACE:-eth0}"
 
 HOSTFILE="${HOSTFILE:-$DEFAULT_HOSTFILE}"
 GEN_SCRIPT="${GEN_SCRIPT:-$DEFAULT_GEN_SCRIPT}"  # path to the Python generator
@@ -19,10 +21,12 @@ NP_TOTAL="${NP_TOTAL:-$((2 * NPERNODE))}"   # -np (total ranks across both nodes
 LOGDIR="${LOGDIR:-$DEFAULT_LOGDIR}" # where per-pair logs go
 MASTER_PORT_BASE="${MASTER_PORT_BASE:-45566}" # will use BASE + job_idx per round
 EXTRA_MPI_ARGS="${EXTRA_MPI_ARGS:-}" # e.g., "--mca pml ucx --mca btl ^openib"
+NET_IFACE="${NET_IFACE:-$DEFAULT_NET_IFACE}"
 
 # Example NCCL/other envs; add/remove as needed:
 export NCCL_DEBUG="${NCCL_DEBUG:-INFO}"
 export LOCAL_WORLD="${LOCAL_WORLD:-$NPERNODE}"
+export NCCL_SOCKET_IFNAME="${NCCL_SOCKET_IFNAME:-$NET_IFACE}"
 
 if [[ -n "${APP_CMD_OVERRIDE:-}" ]]; then
   # Allow overriding the application command via APP_CMD_OVERRIDE="python myscript.py --flag"
@@ -144,10 +148,14 @@ for combo in "${combinations[@]}"; do
       --tag-output
       --display-map
       --allow-run-as-root
+      --bind-to none
+      --mca btl_tcp_if_include "${NET_IFACE}"
+      --mca oob_tcp_if_include "${NET_IFACE}"
       -np "$NP_TOTAL"
       -H "${node1}:${NPERNODE},${node2}:${NPERNODE}"
       -x LOCAL_WORLD
       -x NCCL_DEBUG
+      -x NCCL_SOCKET_IFNAME
       -x "MASTER_ADDR=${node1}"
       -x "MASTER_PORT=${master_port}"
       "${extras[@]}"
