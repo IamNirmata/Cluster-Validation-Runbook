@@ -156,7 +156,6 @@ for combo in "${combinations[@]}"; do
       -x LOCAL_WORLD
       -x NCCL_DEBUG
       -x NCCL_SOCKET_IFNAME
-      -x gcrnode
       -x "MASTER_ADDR=${node1}"
       -x "MASTER_PORT=${master_port}"
       "${extras[@]}"
