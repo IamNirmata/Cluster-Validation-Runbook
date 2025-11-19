@@ -131,6 +131,14 @@ for combo in "${combinations[@]}"; do
     echo "    Master port: $master_port"
 
     log_file="${LOGDIR}/round${round_idx}_job${job_idx}_${node1}--${node2}.log"
+
+    # Checkpoint check: if log exists and contains "busbw:", assume success and skip
+    if [[ -f "$log_file" ]] && grep -q "busbw:" "$log_file"; then
+        echo "Skipping Round $round_idx Job $job_idx ($node1 & $node2) - already completed."
+        ((job_idx++)) || true
+        continue
+    fi
+
     echo "Launching Job${job_idx}: $node1 & $node2  -> $log_file"
 
 
