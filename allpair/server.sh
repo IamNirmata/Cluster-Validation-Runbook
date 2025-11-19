@@ -6,6 +6,30 @@ CONTROL_FIFO="/tmp/allpair_control"
 SSHD_PID=""
 signal_sent=0
 
+print_log_summary() {
+  if [[ ! -d "$LOGDIR" ]]; then
+    echo "No log directory $LOGDIR found."
+    return
+  fi
+
+  mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
+  if (( ${#log_files[@]} == 0 )); then
+    echo "No per-pair logs were generated in $LOGDIR."
+    return
+  fi
+
+  echo "=== AllReduce log summary ($LOGDIR) ==="
+  for log_file in "${log_files[@]}"; do
+    echo "--- ${log_file} ---"
+    if [[ -s "$log_file" ]]; then
+      tail -n 20 "$log_file" || true
+    else
+      echo "(empty log)"
+    fi
+  done
+  echo "=== End of log summary ==="
+}
+
 send_completion() {
   local code=${1:-0}
   if (( signal_sent == 1 )); then
@@ -116,33 +140,8 @@ export HOSTFILE=/opt/hostfile
 export LOGDIR=${LOGDIR:-/opt/allpair-logs}
 mkdir -p "$LOGDIR"
 
-echo "Starting all-pair validation via $SCRIPT_DIR/allpair.sh"
-set +e
-bash "$SCRIPT_DIR/allpair.sh"
-run_status=$?
-set -e
-
-if (( run_status != 0 )); then
-  echo "allpair.sh exited with status $run_status"
-  if [[ -d "$LOGDIR" ]]; then
-    first_log=$(find "$LOGDIR" -type f -name '*.log' | head -n1)
-    if [[ -n "$first_log" ]]; then
-      echo "--- Begin tail of $first_log ---"
-      tail -n 80 "$first_log" || true
-      echo "--- End tail of $first_log ---"
-    else
-      echo "No log files found under $LOGDIR"
-    fi
-  fi
-fi
-
-send_completion "$run_status"
-signal_sent=1
-
-if (( run_status == 0 )); then
-  echo "All-pair validation finished; completion marker sent."
-else
-  echo "All-pair validation failed; completion marker sent."
-fi
-
-exit "$run_status"
+echo "Automatic allpair.sh launch disabled. Exec into this pod to run: bash $SCRIPT_DIR/allpair.sh"
+echo "Sleeping indefinitely (tail -f /dev/null) so the container stays running."
+tail -f /dev/null &
+sleep_pid=$!
+wait "$sleep_pid"
