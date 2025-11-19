@@ -9,7 +9,7 @@ signal_sent=0
 wait_for_clients() {
   if [[ -z "${VC_CLIENT_HOSTS:-}" ]]; then
     return 0
-  }
+  fi
 
   IFS=',' read -ra raw_clients <<< "${VC_CLIENT_HOSTS}"
   for raw_host in "${raw_clients[@]}"; do
