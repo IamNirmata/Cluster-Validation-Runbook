@@ -63,22 +63,8 @@ spec:
               args:
                 - |
                   set -eo pipefail
-                  export DEBIAN_FRONTEND=noninteractive
-                  apt-get update -y
-                  apt-get install -y --no-install-recommends openssh-server openssh-client ca-certificates \
-                    ibverbs-utils rdmacm-utils perftest infiniband-diags
-                  mkdir -p /run/sshd && ssh-keygen -A
-                  /usr/sbin/sshd -D -e &
-                  for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done > /opt/hostfile
-                  for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
-                  git clone https://github.com/IamNirmata/Distrbuted_training_tools.git /opt/Distrbuted_training_tools
-                  # sleep 60
-                  echo "#########################Hostfile#########################"
-                  cat /opt/hostfile
-                  echo "##########################################################"
-                  # bash /opt/Distrbuted_training_tools/testrun.sh
-                  sleep 6000
-                  echo "tests done."
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  bash /opt/Cluster-Validation-Runbook/allpair/server.sh
               resources:
                 requests:
                   nvidia.com/gpu: "8"
@@ -91,7 +77,7 @@ spec:
                   memory: "2500Gi"
                   rdma/rdma_shared_device_a: "1"
     - name: client
-      replicas: 1
+      replicas: 2
       template:
         metadata:
           labels:
@@ -145,26 +131,8 @@ spec:
               args:
                 - |
                   set -eo pipefail
-                  export DEBIAN_FRONTEND=noninteractive
-                  apt-get update -y
-                  apt-get install -y --no-install-recommends openssh-server openssh-client ca-certificates \
-                    ibverbs-utils rdmacm-utils perftest infiniband-diags
-                  mkdir -p /run/sshd && ssh-keygen -A
-                  /usr/sbin/sshd -D -e &
-                  SERVER_HOST="$(tr ',' '\n' < /etc/volcano/VC_SERVER_HOSTS | head -n1)"
-                  if [[ -z "$SERVER_HOST" ]]; then
-                    echo "VC_SERVER_HOSTS empty or missing"; exit 1
-                  fi
-                  echo "Server host: $SERVER_HOST"
-                  for i in $(seq 1 60); do getent hosts "$SERVER_HOST" && break; echo "Waiting for DNS $SERVER_HOST"; sleep 2; done
-                  for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done > /opt/hostfile
-                  for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
-                  echo "#########################Hostfile#########################"
-                  cat /opt/hostfile
-                  echo "##########################################################"
-                  git clone https://github.com/IamNirmata/Distrbuted_training_tools.git /opt/Distrbuted_training_tools
-                  sleep 6000
-                  echo "Client done."
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  bash /opt/Cluster-Validation-Runbook/allpair/client.sh
               resources:
                 requests:
                   nvidia.com/gpu: "8"
