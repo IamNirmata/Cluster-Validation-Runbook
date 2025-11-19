@@ -179,7 +179,7 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do
 done >> /opt/hostfile
 
 
-# Clone Distributed Training Tools repository
+# Clone Cluster Validation Runbook repository
 git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
 
 echo "#########################Hostfile#########################"
