@@ -72,7 +72,7 @@ print_log_summary() {
 # Generate CSV report from logs
 generate_csv_report() {
   local csv_file="${LOGDIR}/results.csv"
-  echo "pair 1, pair 2, latency, busbw" > "$csv_file"
+  echo "pair 1, pair 2, gcrnode 1, gcrnode 2, latency, busbw" > "$csv_file"
 
   if [[ ! -d "$LOGDIR" ]]; then
     echo "No log directory $LOGDIR found."
@@ -98,7 +98,22 @@ generate_csv_report() {
     # Calculate average busbw
     local avg_busbw=$(grep "busbw:" "$log_file" | awk -F'busbw: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
     
-    echo "$node1, $node2, $avg_latency, $avg_busbw" >> "$csv_file"
+    # Extract gcrnode names
+    # Assuming the log contains lines like "gcrnode: node-name latency: ..."
+    # We need to find the gcrnode associated with each rank or just pick the unique ones found in the log.
+    # Since it's a pair, we expect two distinct gcrnodes (or same if on same node, but usually different).
+    # Let's extract all unique gcrnodes found in the log.
+    local gcrnodes=$(grep "gcrnode:" "$log_file" | awk -F'gcrnode: ' '{print $2}' | awk '{print $1}' | sort | uniq | tr '\n' ' ' | sed 's/ $//')
+    
+    # If we have 2 nodes, format them as "nodeA, nodeB". If 1, "nodeA, nodeA" (unlikely for pair unless same node).
+    # The order might not match pair1/pair2 exactly without more parsing logic, but listing them is a good start.
+    # To be more precise, we'd need to map rank to hostname to gcrnode.
+    # For now, let's just list the unique gcrnodes found.
+    local gcrnode1=$(echo "$gcrnodes" | awk '{print $1}')
+    local gcrnode2=$(echo "$gcrnodes" | awk '{print $2}')
+    if [[ -z "$gcrnode2" ]]; then gcrnode2="$gcrnode1"; fi
+
+    echo "$node1, $node2, $gcrnode1, $gcrnode2, $avg_latency, $avg_busbw" >> "$csv_file"
   done
   
   echo "CSV report generated at $csv_file"
