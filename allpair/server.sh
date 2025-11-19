@@ -178,6 +178,8 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do
   echo "$host slots=8"
 done >> /opt/hostfile
 
+
+# Clone Distributed Training Tools repository
 git clone https://github.com/IamNirmata/Distrbuted_training_tools.git /opt/Distrbuted_training_tools
 
 echo "#########################Hostfile#########################"
