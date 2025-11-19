@@ -263,9 +263,8 @@ for host in "${HOSTS[@]}"; do
   # We use -np 1 and -H <host> to run a single process on that host
   # We assume 'gcrnode' env var is available on the remote host (exported by kubernetes/volcano)
   # We do NOT use -x gcrnode because that would export the LOCAL gcrnode value to the remote host.
-  # Since sshd might not expose the env vars, we read them from PID 1.
   
-  gcrnode=$(mpirun --allow-run-as-root -np 1 -H "$host" bash -c "cat /proc/1/environ | tr '\0' '\n' | grep ^gcrnode= | cut -d= -f2")
+  gcrnode=$(mpirun --allow-run-as-root -np 1 -H "$host" bash -c 'echo "$gcrnode"')
   
   # Clean up output if necessary (mpirun might add some noise, but usually stdout is clean with single command)
   # If gcrnode is empty, it might be because it wasn't exported or set.
