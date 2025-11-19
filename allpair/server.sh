@@ -43,7 +43,7 @@ wait_for_clients() {
 }
 
 
-
+# Print summary of all per-pair logs
 print_log_summary() {
   if [[ ! -d "$LOGDIR" ]]; then
     echo "No log directory $LOGDIR found."
