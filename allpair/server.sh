@@ -168,6 +168,7 @@ send_completion() {
     --host "$hostlist" \
     -x COMPLETION_MESSAGE \
     -x ALLPAIR_CONTROL_FIFO \
+    -x gcrnode \
     bash -lc 'printf "%s\n" "${COMPLETION_MESSAGE:-done}" > "${ALLPAIR_CONTROL_FIFO:-/tmp/allpair_control}"'
   if [[ $? -ne 0 ]]; then
     echo "WARN: Unable to broadcast completion marker via mpirun" >&2
