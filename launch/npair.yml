@@ -51,6 +51,8 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: spec.nodeName
+                - name: ALLPAIR_DEBUG
+                  value: "1"
               volumeMounts:
                 - name: dshm
                   mountPath: /dev/shm
