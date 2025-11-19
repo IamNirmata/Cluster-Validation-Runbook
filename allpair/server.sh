@@ -243,6 +243,42 @@ mkdir -p "$LOGDIR"
 
 wait_for_clients
 
+# Generate node_map.csv
+echo "Generating node_map.csv..."
+NODE_MAP_FILE="/opt/node_map.csv"
+echo "pod_name,gcrnode" > "$NODE_MAP_FILE"
+
+# Read hosts from hostfile
+mapfile -t HOSTS < <(awk '{print $1}' "$HOSTFILE")
+
+for host in "${HOSTS[@]}"; do
+  # Run mpirun to get gcrnode from the remote host
+  # We use -np 1 and -H <host> to run a single process on that host
+  # We assume 'gcrnode' env var is available on the remote host (exported by kubernetes/volcano)
+  # However, mpirun might not propagate it by default unless we use -x gcrnode, but we are running FROM server TO client.
+  # The client pod has 'gcrnode' env var set in its spec.
+  # We need to make sure we can access it.
+  # Let's try running 'echo $gcrnode' via bash.
+  
+  gcrnode=$(mpirun --allow-run-as-root -np 1 -H "$host" -x gcrnode bash -c 'echo "$gcrnode"')
+  
+  # Clean up output if necessary (mpirun might add some noise, but usually stdout is clean with single command)
+  # If gcrnode is empty, it might be because it wasn't exported or set.
+  # But based on the yaml, it is set in the container env.
+  
+  if [[ -n "$gcrnode" ]]; then
+      echo "$host,$gcrnode" >> "$NODE_MAP_FILE"
+      echo "Mapped $host to $gcrnode"
+  else
+      echo "WARN: Could not retrieve gcrnode for $host"
+      echo "$host,unknown" >> "$NODE_MAP_FILE"
+  fi
+done
+
+echo "node_map.csv generated:"
+cat "$NODE_MAP_FILE"
+
+
 echo "Starting automatic allpair run via $SCRIPT_DIR/allpair.sh"
 if bash "$SCRIPT_DIR/allpair.sh"; then
   print_log_summary
