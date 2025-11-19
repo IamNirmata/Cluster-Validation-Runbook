@@ -117,7 +117,32 @@ export LOGDIR=${LOGDIR:-/opt/allpair-logs}
 mkdir -p "$LOGDIR"
 
 echo "Starting all-pair validation via $SCRIPT_DIR/allpair.sh"
+set +e
 bash "$SCRIPT_DIR/allpair.sh"
+run_status=$?
+set -e
 
-send_completion 0
-echo "All-pair validation finished; completion marker sent."
+if (( run_status != 0 )); then
+  echo "allpair.sh exited with status $run_status"
+  if [[ -d "$LOGDIR" ]]; then
+    first_log=$(find "$LOGDIR" -type f -name '*.log' | head -n1)
+    if [[ -n "$first_log" ]]; then
+      echo "--- Begin tail of $first_log ---"
+      tail -n 80 "$first_log" || true
+      echo "--- End tail of $first_log ---"
+    else
+      echo "No log files found under $LOGDIR"
+    fi
+  fi
+fi
+
+send_completion "$run_status"
+signal_sent=1
+
+if (( run_status == 0 )); then
+  echo "All-pair validation finished; completion marker sent."
+else
+  echo "All-pair validation failed; completion marker sent."
+fi
+
+exit "$run_status"
