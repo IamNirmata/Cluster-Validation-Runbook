@@ -1,0 +1,4 @@
+pair 1, pair 2, latency, busbw
+mpi-allpair-allreduce-haritrs9b-client-0.mpi-allpair-allreduce-haritrs9b, mpi-allpair-allreduce-haritrs9b-client-1.mpi-allpair-allreduce-haritrs9b, 0.04500071, 666.65617757
+mpi-allpair-allreduce-haritrs9b-server-0.mpi-allpair-allreduce-haritrs9b, mpi-allpair-allreduce-haritrs9b-client-1.mpi-allpair-allreduce-haritrs9b, 0.04495498, 667.33423412
+mpi-allpair-allreduce-haritrs9b-server-0.mpi-allpair-allreduce-haritrs9b, mpi-allpair-allreduce-haritrs9b-client-0.mpi-allpair-allreduce-haritrs9b, 0.04497971, 666.96737663
