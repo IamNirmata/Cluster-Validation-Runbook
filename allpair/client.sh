@@ -60,7 +60,11 @@ echo "#########################Hostfile#########################"
 cat /opt/hostfile
 echo "##########################################################"
 
-git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+if [[ ! -d /opt/Cluster-Validation-Runbook/.git ]]; then
+  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+else
+  echo "Cluster-Validation-Runbook already present at /opt; skipping clone."
+fi
 rm -f "$CONTROL_FIFO"
 mkfifo "$CONTROL_FIFO"
 chmod 600 "$CONTROL_FIFO"
