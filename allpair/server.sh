@@ -69,6 +69,43 @@ print_log_summary() {
 }
 
 
+# Generate CSV report from logs
+generate_csv_report() {
+  local csv_file="${LOGDIR}/results.csv"
+  echo "pair 1, pair 2, latency, busbw" > "$csv_file"
+
+  if [[ ! -d "$LOGDIR" ]]; then
+    echo "No log directory $LOGDIR found."
+    return
+  fi
+
+  mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
+  
+  for log_file in "${log_files[@]}"; do
+    local filename=$(basename "$log_file")
+    # Remove prefix roundX_jobY_
+    local temp="${filename#round*_job*_}"
+    # Remove suffix .log
+    temp="${temp%.log}"
+    
+    # Split by --
+    local node1="${temp%--*}"
+    local node2="${temp##*--}"
+    
+    # Calculate average latency
+    local avg_latency=$(grep "latency:" "$log_file" | awk -F'latency: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
+    
+    # Calculate average busbw
+    local avg_busbw=$(grep "busbw:" "$log_file" | awk -F'busbw: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
+    
+    echo "$node1, $node2, $avg_latency, $avg_busbw" >> "$csv_file"
+  done
+  
+  echo "CSV report generated at $csv_file"
+  cat "$csv_file"
+}
+
+
 # Send completion signal to all clients
 send_completion() {
   local code=${1:-0}
@@ -199,9 +236,11 @@ wait_for_clients
 echo "Starting automatic allpair run via $SCRIPT_DIR/allpair.sh"
 if bash "$SCRIPT_DIR/allpair.sh"; then
   print_log_summary
+  generate_csv_report
 else
   status=$?
   echo "allpair.sh exited with status $status" >&2
   print_log_summary
+  generate_csv_report
   exit "$status"
 fi
