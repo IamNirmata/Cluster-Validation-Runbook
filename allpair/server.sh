@@ -180,7 +180,7 @@ done >> /opt/hostfile
 
 
 # Clone Distributed Training Tools repository
-git clone https://github.com/IamNirmata/Distributed_Training_Tools.git /opt/Distributed_Training_Tools
+git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
 
 echo "#########################Hostfile#########################"
 cat /opt/hostfile
