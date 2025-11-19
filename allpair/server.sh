@@ -126,7 +126,7 @@ send_completion() {
 }
 
 
-
+# Cleanup function to handle script termination
 cleanup() {
   local code=${1:-0}
 
@@ -144,6 +144,9 @@ cleanup() {
 }
 
 trap 'code=$?; trap - EXIT; cleanup "$code"; exit "$code"' EXIT
+
+
+
 
 export DEBIAN_FRONTEND=noninteractive
 
