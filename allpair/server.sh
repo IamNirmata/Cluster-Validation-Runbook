@@ -6,6 +6,40 @@ CONTROL_FIFO="/tmp/allpair_control"
 SSHD_PID=""
 signal_sent=0
 
+wait_for_clients() {
+  if [[ -z "${VC_CLIENT_HOSTS:-}" ]]; then
+    return 0
+  }
+
+  IFS=',' read -ra raw_clients <<< "${VC_CLIENT_HOSTS}"
+  for raw_host in "${raw_clients[@]}"; do
+    local host
+    host="$(echo "$raw_host" | xargs)"
+    if [[ -z "$host" ]]; then
+      continue
+    fi
+
+    echo "Waiting for SSH on $host ..."
+    local ready=0
+    for attempt in {1..60}; do
+      if ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=5 \
+            "$host" true >/dev/null 2>&1; then
+        ready=1
+        break
+      fi
+      sleep 2
+    done
+
+    if (( ready == 0 )); then
+      echo "ERROR: Unable to reach $host via SSH after waiting" >&2
+      return 1
+    fi
+  done
+}
+
 print_log_summary() {
   if [[ ! -d "$LOGDIR" ]]; then
     echo "No log directory $LOGDIR found."
@@ -139,6 +173,8 @@ echo "##########################################################"
 export HOSTFILE=/opt/hostfile
 export LOGDIR=${LOGDIR:-/opt/allpair-logs}
 mkdir -p "$LOGDIR"
+
+wait_for_clients
 
 echo "Starting automatic allpair run via $SCRIPT_DIR/allpair.sh"
 if bash "$SCRIPT_DIR/allpair.sh"; then
