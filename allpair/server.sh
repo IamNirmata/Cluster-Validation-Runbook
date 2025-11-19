@@ -7,7 +7,7 @@ SSHD_PID=""
 signal_sent=0
 
 
-#ssh wait for clients to be reachable via ssh
+#SSH - wait for clients to be reachable via ssh
 wait_for_clients() {
   if [[ -z "${VC_CLIENT_HOSTS:-}" ]]; then
     return 0
@@ -41,6 +41,8 @@ wait_for_clients() {
     fi
   done
 }
+
+
 
 print_log_summary() {
   if [[ ! -d "$LOGDIR" ]]; then
