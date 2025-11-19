@@ -291,13 +291,23 @@ done
 echo "node_map.csv generated:"
 cat "$NODE_MAP_FILE"
 
+# Start a background process to update results.csv periodically
+(
+  while true; do
+    sleep 30
+    generate_csv_report
+  done
+) &
+REPORT_PID=$!
 
 echo "Starting automatic allpair run via $SCRIPT_DIR/allpair.sh"
 if bash "$SCRIPT_DIR/allpair.sh"; then
+  kill "$REPORT_PID" || true
   print_log_summary
   generate_csv_report
 else
   status=$?
+  kill "$REPORT_PID" || true
   echo "allpair.sh exited with status $status" >&2
   print_log_summary
   generate_csv_report
