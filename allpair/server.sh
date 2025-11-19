@@ -179,8 +179,12 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do
 done >> /opt/hostfile
 
 
-# Clone Cluster Validation Runbook repository
-git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+# Clone Cluster Validation Runbook repository if it is not already present
+if [[ ! -d /opt/Cluster-Validation-Runbook/.git ]]; then
+  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+else
+  echo "Cluster-Validation-Runbook already present at /opt; skipping clone."
+fi
 
 echo "#########################Hostfile#########################"
 cat /opt/hostfile
