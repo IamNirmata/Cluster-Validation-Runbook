@@ -68,6 +68,8 @@ print_log_summary() {
   echo "=== End of log summary ==="
 }
 
+
+# Send completion signal to all clients
 send_completion() {
   local code=${1:-0}
   if (( signal_sent == 1 )); then
@@ -122,6 +124,8 @@ send_completion() {
 
   signal_sent=1
 }
+
+
 
 cleanup() {
   local code=${1:-0}
