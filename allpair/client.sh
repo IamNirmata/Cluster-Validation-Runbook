@@ -60,8 +60,7 @@ echo "#########################Hostfile#########################"
 cat /opt/hostfile
 echo "##########################################################"
 
-git clone https://github.com/IamNirmata/Distrbuted_training_tools.git /opt/Distrbuted_training_tools
-
+git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
 rm -f "$CONTROL_FIFO"
 mkfifo "$CONTROL_FIFO"
 chmod 600 "$CONTROL_FIFO"
