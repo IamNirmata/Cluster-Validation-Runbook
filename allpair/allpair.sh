@@ -173,7 +173,7 @@ for combo in "${combinations[@]}"; do
 
     # Optionally show the command for debugging.
     echo "    Running: ${mp_cmd[*]}"
-    ((job_idx++))
+    ((job_idx++)) || true
   done
 
   
@@ -199,7 +199,7 @@ for combo in "${combinations[@]}"; do
       echo "  $lf"
     done
   fi
-  ((round_idx++))
+  ((round_idx++)) || true
 done
 
 echo
