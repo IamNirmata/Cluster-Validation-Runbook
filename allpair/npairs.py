@@ -36,7 +36,9 @@ for _ in range(ITERATIONS):
 torch.cuda.synchronize()
 duration = (time.perf_counter() - pre) / ITERATIONS
 busbw = ((size/g) / (duration)) *(2 * (world_size - 1) / world_size)
-print(f"latency: {duration} busbw: {busbw}")
+gcrnode = os.environ.get("gcrnode", "unknown_node")
+hostname = socket.gethostname()
+print(f"host: {hostname} gcrnode: {gcrnode} latency: {duration} busbw: {busbw}")
 
 
 dist.destroy_process_group()
