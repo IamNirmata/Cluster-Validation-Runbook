@@ -20,7 +20,7 @@ trap 'code=$?; trap - EXIT; cleanup "$code"' EXIT
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get update -y
+for i in {1..5}; do apt-get update -y && break || sleep 15; done
 apt-get install -y --no-install-recommends \
   openssh-server \
   openssh-client \
