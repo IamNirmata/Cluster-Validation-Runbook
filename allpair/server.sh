@@ -249,10 +249,11 @@ echo "##########################################################"
 export HOSTFILE=/opt/hostfile
 
 # Use persistent storage for logs if available, to support checkpointing/resuming
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 if [[ -d "/data" ]]; then
-    export LOGDIR=${LOGDIR:-/data/allpair-logs}
+    export LOGDIR=${LOGDIR:-/data/allpair-logs/${TIMESTAMP}}
 else
-    export LOGDIR=${LOGDIR:-/opt/allpair-logs}
+    export LOGDIR=${LOGDIR:-/opt/allpair-logs/${TIMESTAMP}}
 fi
 mkdir -p "$LOGDIR"
 
