@@ -71,31 +71,39 @@ print_log_summary() {
 
 # Generate CSV report from logs
 generate_csv_report() {
-  local csv_file="${LOGDIR}/results.csv"
-  local node_map_file="/opt/node_map.csv"
-  echo "pair 1, pair 1 gcrnode, pair 2, pair 2 gcrnode, latency, busbw" > "$csv_file"
-
   if [[ ! -d "$LOGDIR" ]]; then
-    echo "No log directory $LOGDIR found."
     return
   fi
   
   # Read node map into associative array
   declare -A node_map
+  local node_map_file="/opt/node_map.csv"
   if [[ -f "$node_map_file" ]]; then
       while IFS=, read -r pod gcrnode; do
           if [[ "$pod" != "pod_name" ]]; then
               node_map["$pod"]="$gcrnode"
           fi
       done < "$node_map_file"
-  else
-      echo "WARN: $node_map_file not found. GCR node names will be unknown."
   fi
+
+  # Clear existing round results to avoid duplicates during updates
+  rm -f "${LOGDIR}/round_"*"_results.csv"
 
   mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
   
   for log_file in "${log_files[@]}"; do
     local filename=$(basename "$log_file")
+    # filename format: round<R>_job<J>_<node1>--<node2>.log
+    
+    # Extract round number
+    local round_part="${filename%%_*}" # round0
+    local round_num="${round_part#round}" # 0
+    local round_csv="${LOGDIR}/round_${round_num}_results.csv"
+    
+    if [[ ! -f "$round_csv" ]]; then
+        echo "pair 1, pair 1 gcrnode, pair 2, pair 2 gcrnode, latency, busbw" > "$round_csv"
+    fi
+
     # Remove prefix roundX_jobY_
     local temp="${filename#round*_job*_}"
     # Remove suffix .log
@@ -115,13 +123,8 @@ generate_csv_report() {
     local gcrnode1="${node_map[$node1]:-unknown}"
     local gcrnode2="${node_map[$node2]:-unknown}"
 
-    echo "$node1, $gcrnode1, $node2, $gcrnode2, $avg_latency, $avg_busbw" >> "$csv_file"
+    echo "$node1, $gcrnode1, $node2, $gcrnode2, $avg_latency, $avg_busbw" >> "$round_csv"
   done
-  
-  echo "CSV report generated at $csv_file"
-  echo "####################################################Final Results: ########################################################"
-  cat "$csv_file"
-  echo "###########################################################################################################################"
 }
 
 
@@ -306,11 +309,15 @@ if bash "$SCRIPT_DIR/allpair.sh"; then
   kill "$REPORT_PID" || true
   print_log_summary
   generate_csv_report
+  # Run aggregation
+  bash "$SCRIPT_DIR/aggregate_results.sh" "$LOGDIR" "${#HOSTS[@]}"
 else
   status=$?
   kill "$REPORT_PID" || true
   echo "allpair.sh exited with status $status" >&2
   print_log_summary
   generate_csv_report
+  # Run aggregation even on failure to capture partial results
+  bash "$SCRIPT_DIR/aggregate_results.sh" "$LOGDIR" "${#HOSTS[@]}"
   exit "$status"
 fi
