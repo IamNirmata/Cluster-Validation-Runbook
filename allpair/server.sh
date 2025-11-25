@@ -309,15 +309,11 @@ if bash "$SCRIPT_DIR/allpair.sh"; then
   kill "$REPORT_PID" || true
   print_log_summary
   generate_csv_report
-  # Run aggregation
-  bash "$SCRIPT_DIR/aggregate_results.sh" "$LOGDIR" "${#HOSTS[@]}"
 else
   status=$?
   kill "$REPORT_PID" || true
   echo "allpair.sh exited with status $status" >&2
   print_log_summary
   generate_csv_report
-  # Run aggregation even on failure to capture partial results
-  bash "$SCRIPT_DIR/aggregate_results.sh" "$LOGDIR" "${#HOSTS[@]}"
   exit "$status"
 fi
