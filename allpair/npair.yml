@@ -66,6 +66,7 @@ spec:
                 - |
                   set -eo pipefail
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  sed -i 's/for attempt in {1..60}; do/for attempt in {1..600}; do/' /opt/Cluster-Validation-Runbook/allpair/server.sh
                   bash /opt/Cluster-Validation-Runbook/allpair/server.sh
               resources:
                 requests:
@@ -141,6 +142,7 @@ spec:
                 - |
                   set -eo pipefail
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  sed -i 's/for _ in $(seq 1 60); do/for _ in $(seq 1 600); do/' /opt/Cluster-Validation-Runbook/allpair/client.sh
                   bash /opt/Cluster-Validation-Runbook/allpair/client.sh
               resources:
                 requests:

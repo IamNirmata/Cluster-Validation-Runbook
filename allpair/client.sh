@@ -41,7 +41,7 @@ if [[ -z "${SERVER_HOST}" ]]; then
   exit 1
 fi
 echo "Server host: ${SERVER_HOST}"
-for _ in $(seq 1 60); do
+for _ in $(seq 1 600); do
   if getent hosts "${SERVER_HOST}" >/dev/null 2>&1; then
     break
   fi

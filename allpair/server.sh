@@ -17,13 +17,13 @@ wait_for_clients() {
   for raw_host in "${raw_clients[@]}"; do
     local host
     host="$(echo "$raw_host" | xargs)"
-    if [[ -z "$host" ]]; then
+    if [[ -z "$host" ]]; then 
       continue
     fi
 
     echo "Waiting for SSH on $host ..."
     local ready=0
-    for attempt in {1..60}; do
+    for attempt in {1..600}; do
       if ssh -o BatchMode=yes \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
