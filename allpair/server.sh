@@ -50,7 +50,8 @@ print_log_summary() {
     return
   fi
 
-  mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
+  # UPDATED: find recursively to handle round subdirectories
+  mapfile -t log_files < <(find "$LOGDIR" -type f -name 'round*_job*.log' | sort)
   if (( ${#log_files[@]} == 0 )); then
     echo "No per-pair logs were generated in $LOGDIR."
     return
@@ -97,8 +98,8 @@ generate_csv_report() {
     processed_map["$line"]=1
   done < "$tracking_file"
 
-  # Find all log files, but process only those not in our map
-  # We use 'find' and loop over it. 
+  # Find all log files RECURSIVELY (using -type f) to check subdirectories
+  # This enables it to find logs inside LOGDIR/round1/, LOGDIR/round2/, etc.
   
   while IFS= read -r log_file; do
     # 1. Check if we have already processed this file
@@ -114,6 +115,8 @@ generate_csv_report() {
             # Extract round number
             local round_part="${filename%%_*}" # round0
             local round_num="${round_part#round}" # 0
+            
+            # We store the CSV in the root LOGDIR to keep aggregation simple
             local round_csv="${LOGDIR}/round_${round_num}_results.csv"
             
             # Create Header if the CSV doesn't exist yet
@@ -149,7 +152,7 @@ generate_csv_report() {
             echo "$log_file" >> "$tracking_file"
         fi
     fi
-  done < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
+  done < <(find "$LOGDIR" -type f -name 'round*_job*.log' | sort)
 }
 
 

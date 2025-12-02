@@ -22,7 +22,7 @@ LOGDIR="${LOGDIR:-$DEFAULT_LOGDIR}" # where per-pair logs go
 MASTER_PORT_BASE="${MASTER_PORT_BASE:-45566}" # will use BASE + job_idx per round
 EXTRA_MPI_ARGS="${EXTRA_MPI_ARGS:-}" # e.g., "--mca pml ucx --mca btl ^openib"
 NET_IFACE="${NET_IFACE:-$DEFAULT_NET_IFACE}"
-# NEW: Allow resuming from a specific round
+# Allow resuming from a specific round (default 0)
 START_ROUND="${START_ROUND:-0}"
 
 # Example NCCL/other envs; add/remove as needed:
@@ -98,18 +98,21 @@ done
 round_idx=0
 for combo in "${combinations[@]}"; do
   
-  # --- RESUME LOGIC ---
+  # --- RESUME LOGIC: Fast-forward if START_ROUND is set ---
   if (( round_idx < START_ROUND )); then
-      # Uncomment the next line if you want verbose skipping logs
-      # echo "Skipping Round $round_idx (Fast-forwarding to $START_ROUND)..."
       ((round_idx++)) || true
       continue
   fi
-  # --------------------
 
   echo
   echo "=== Round $round_idx ==="
-  echo "############################################################################"
+  
+  # --- DIRECTORY ORGANIZATION START ---
+  # Create a specific directory for this round
+  ROUND_DIR="${LOGDIR}/round${round_idx}"
+  mkdir -p "$ROUND_DIR"
+  # ------------------------------------
+
   # combo format: '0 9 | 1 8 | 2 7 | ...'
   IFS='|' read -r -a pairs <<< "$combo"
 
@@ -138,12 +141,12 @@ for combo in "${combinations[@]}"; do
       continue
     fi
 
-    # Unique-ish port per job in a round (not strictly required since nodes
-    # do not repeat within a round, but keeps things tidy)
+    # Unique-ish port per job in a round
     master_port=$((MASTER_PORT_BASE + job_idx))
     echo "    Master port: $master_port"
 
-    log_file="${LOGDIR}/round${round_idx}_job${job_idx}_${node1}--${node2}.log"
+    # Save log file INSIDE the round directory
+    log_file="${ROUND_DIR}/round${round_idx}_job${job_idx}_${node1}--${node2}.log"
 
     # Checkpoint check: if log exists and contains "busbw:", assume success and skip
     if [[ -f "$log_file" ]] && grep -q "busbw:" "$log_file"; then
