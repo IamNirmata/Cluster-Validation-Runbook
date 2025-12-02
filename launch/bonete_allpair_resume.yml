@@ -65,6 +65,7 @@ spec:
               volumeMounts:
                 - name: dshm
                   mountPath: /dev/shm
+                  
                 - name: data
                   mountPath: /data
                 - name: sys
