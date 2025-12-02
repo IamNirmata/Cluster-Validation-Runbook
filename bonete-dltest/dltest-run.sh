@@ -38,4 +38,7 @@ MASTER_ADDR=localhost MASTER_PORT=9500 PYTHONPATH=src torchrun --nproc_per_node=
 cp $gcrnode.txt $DLTEST_LOG_DIR/
 echo "DL UNIT TEST completed on $gcrnode. Logs copied to $DLTEST_LOG_DIR/$gcrnode.txt"
 
+#copy /opt/dl_unittest_bonete/test_plans/80gb-placeholder/runs/* to DLTEST_LOG_DIR
+cp -r $SCRIPT_DIR/test_plans/80gb-placeholder/runs/* $DLTEST_LOG_DIR/
+echo "Copied test run logs to $DLTEST_LOG_DIR/"
 
