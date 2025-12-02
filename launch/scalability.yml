@@ -10,6 +10,7 @@ spec:
     ssh: []   # passwordless SSH
     svc: []   # creates VC_SERVER_HOSTS and VC_CLIENT_HOSTS
     env: []   # VC_* envs
+    mpi: ["--master=server", "--worker=client"]
   tasks:
     - name: server
       replicas: 1
@@ -25,7 +26,7 @@ spec:
             - name: dshm
               emptyDir:
                 medium: Memory
-                sizeLimit: 100Gi
+                sizeLimit: 256Gi
           tolerations:
             - key: "rdma"
               operator: "Exists"
