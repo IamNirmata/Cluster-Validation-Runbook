@@ -86,48 +86,70 @@ generate_csv_report() {
       done < "$node_map_file"
   fi
 
-  # Clear existing round results to avoid duplicates during updates
-  # NOTE: When resuming, this might delete prev results for resumed rounds, 
-  # but since we append, we usually want to be careful. 
-  # For now, we delete to regenerate fresh based on logs present.
-  rm -f "${LOGDIR}/round_"*"_results.csv"
-
-  mapfile -t log_files < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
+  # INCREMENTAL UPDATE LOGIC
+  # We use a tracking file to remember which logs we have already parsed.
+  local tracking_file="${LOGDIR}/.processed_logs_tracker"
+  touch "$tracking_file"
   
-  for log_file in "${log_files[@]}"; do
-    local filename=$(basename "$log_file")
-    # filename format: round<R>_job<J>_<node1>--<node2>.log
-    
-    # Extract round number
-    local round_part="${filename%%_*}" # round0
-    local round_num="${round_part#round}" # 0
-    local round_csv="${LOGDIR}/round_${round_num}_results.csv"
-    
-    if [[ ! -f "$round_csv" ]]; then
-        echo "pair 1, pair 1 gcrnode, pair 2, pair 2 gcrnode, latency, busbw" > "$round_csv"
+  # Load tracked files into a map for O(1) lookup
+  declare -A processed_map
+  while IFS= read -r line; do
+    processed_map["$line"]=1
+  done < "$tracking_file"
+
+  # Find all log files, but process only those not in our map
+  # We use 'find' and loop over it. 
+  
+  while IFS= read -r log_file; do
+    # 1. Check if we have already processed this file
+    if [[ -z "${processed_map[$log_file]}" ]]; then
+        
+        # 2. Check if the job is actually complete (has results)
+        # We look for "busbw:" which indicates the benchmark finished.
+        if grep -q "busbw:" "$log_file"; then
+            
+            local filename=$(basename "$log_file")
+            # filename format: round<R>_job<J>_<node1>--<node2>.log
+            
+            # Extract round number
+            local round_part="${filename%%_*}" # round0
+            local round_num="${round_part#round}" # 0
+            local round_csv="${LOGDIR}/round_${round_num}_results.csv"
+            
+            # Create Header if the CSV doesn't exist yet
+            if [[ ! -f "$round_csv" ]]; then
+                echo "pair 1, pair 1 gcrnode, pair 2, pair 2 gcrnode, latency, busbw" > "$round_csv"
+            fi
+
+            # Parse Filename info
+            # Remove prefix roundX_jobY_
+            local temp="${filename#round*_job*_}"
+            # Remove suffix .log
+            temp="${temp%.log}"
+            
+            # Split by --
+            local node1="${temp%--*}"
+            local node2="${temp##*--}"
+            
+            # Extract Metrics
+            # Calculate average latency
+            local avg_latency=$(grep "latency:" "$log_file" | awk -F'latency: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
+            
+            # Calculate average busbw
+            local avg_busbw=$(grep "busbw:" "$log_file" | awk -F'busbw: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
+            
+            # Lookup gcrnode names
+            local gcrnode1="${node_map[$node1]:-unknown}"
+            local gcrnode2="${node_map[$node2]:-unknown}"
+
+            # Append to CSV
+            echo "$node1, $gcrnode1, $node2, $gcrnode2, $avg_latency, $avg_busbw" >> "$round_csv"
+            
+            # Mark as processed so we don't scan it again
+            echo "$log_file" >> "$tracking_file"
+        fi
     fi
-
-    # Remove prefix roundX_jobY_
-    local temp="${filename#round*_job*_}"
-    # Remove suffix .log
-    temp="${temp%.log}"
-    
-    # Split by --
-    local node1="${temp%--*}"
-    local node2="${temp##*--}"
-    
-    # Calculate average latency
-    local avg_latency=$(grep "latency:" "$log_file" | awk -F'latency: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
-    
-    # Calculate average busbw
-    local avg_busbw=$(grep "busbw:" "$log_file" | awk -F'busbw: ' '{print $2}' | awk '{print $1}' | awk '{sum+=$1; n++} END {if (n>0) printf "%.8f", sum/n; else print "0"}')
-    
-    # Lookup gcrnode names
-    local gcrnode1="${node_map[$node1]:-unknown}"
-    local gcrnode2="${node_map[$node2]:-unknown}"
-
-    echo "$node1, $gcrnode1, $node2, $gcrnode2, $avg_latency, $avg_busbw" >> "$round_csv"
-  done
+  done < <(find "$LOGDIR" -maxdepth 1 -type f -name 'round*_job*.log' | sort)
 }
 
 

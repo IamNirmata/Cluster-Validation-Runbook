@@ -109,6 +109,7 @@ for combo in "${combinations[@]}"; do
 
   echo
   echo "=== Round $round_idx ==="
+  echo "############################################################################"
   # combo format: '0 9 | 1 8 | 2 7 | ...'
   IFS='|' read -r -a pairs <<< "$combo"
 
