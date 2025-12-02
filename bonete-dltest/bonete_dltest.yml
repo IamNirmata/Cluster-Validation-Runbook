@@ -10,7 +10,7 @@ spec:
     ssh: []
     svc: []
     env: []
-    mpi : ["--master=server", "--worker=client"]
+    mpi: []
   tasks:
     - name: server
       replicas: 2
