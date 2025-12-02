@@ -58,6 +58,10 @@ spec:
                       fieldPath: spec.nodeName
                 - name: ALLPAIR_DEBUG
                   value: "1"
+                - name: LOGDIR
+                  value: "/data/allpair-logs/20251202_051923"
+                - name: START_ROUND
+                  value: "26"
               volumeMounts:
                 - name: dshm
                   mountPath: /dev/shm

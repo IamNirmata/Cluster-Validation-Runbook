@@ -1,7 +1,7 @@
 apiVersion: batch.volcano.sh/v1alpha1
 kind: Job
 metadata:
-  generateName: mpi-allpair-allreduce-hari-
+  generateName: gcr-mpi-scalability-hari-
   namespace: gcr-admin-test1
 spec:
   queue: default
@@ -72,19 +72,29 @@ spec:
               command: ["/bin/bash", "-lc"]
               args:
                 - |
-                  set -eo pipefail
-                  echo "=== Server Node ==="
-                  hostname
-                  nvidia-smi
+                  set -xeo pipefail
                   
-                  echo "=== PVC Check ==="
-                  df -h /data
-                  ls -la /data
+                  # 1. Clone Repo
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  # 2. Source the common setup script
+                  # This installs/starts sshd AND exports MASTER_ADDR/PORT
+                  source /opt/Cluster-Validation-Runbook/scalability/env.sh
                   
-                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
-                  bash /opt/Cluster-Validation-Runbook/allpair/server.sh
+                  # 3. Wait for workers to be ready for SSH
+                  bash /opt/Cluster-Validation-Runbook/scalability/wait-for-ssh.sh
                   
-                  echo "=== Allpair done, sleeping forever ==="
+                  # 4. Run the main test suite
+                  echo "Starting Test Suite..."
+                  cd /opt/Cluster-Validation-Runbook/scalability
+                  
+                  echo "Making scripts executable..."
+                  chmod +x *.sh
+
+                  bash ./latency.sh
+                  bash ./bw.sh
+                  bash ./scale.sh
+                  
+                  echo "Tests finished. Sleeping."
                   sleep infinity
               resources:
                 requests:
@@ -157,18 +167,14 @@ spec:
               command: ["/bin/bash", "-lc"]
               args:
                 - |
-                  set -eo pipefail
-                  echo "=== Client Node ==="
-                  hostname
-                  nvidia-smi
+                  set -xeo pipefail
+                  # 1. Clone Repo
+                    git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  # 2. Source the common setup script
+                  # This installs/starts sshd
+                  source /opt/Cluster-Validation-Runbook/scalability/env.sh
                   
-                  echo "=== PVC Check ==="
-                  df -h /data
-
-                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
-                  bash /opt/Cluster-Validation-Runbook/allpair/client.sh
-                  
-                  echo "=== Client ready, sleeping forever ==="
+                  echo "Worker ready. Sleeping."
                   sleep infinity
               resources:
                 requests:
