@@ -22,8 +22,14 @@ LOGDIR="${LOGDIR:-$DEFAULT_LOGDIR}" # where per-pair logs go
 MASTER_PORT_BASE="${MASTER_PORT_BASE:-45566}" # will use BASE + job_idx per round
 EXTRA_MPI_ARGS="${EXTRA_MPI_ARGS:-}" # e.g., "--mca pml ucx --mca btl ^openib"
 NET_IFACE="${NET_IFACE:-$DEFAULT_NET_IFACE}"
+
 # Allow resuming from a specific round (default 0)
 START_ROUND="${START_ROUND:-0}"
+
+# TIMEOUT CONFIGURATION
+# Default: 600 seconds (10 minutes).
+# The -k option kills the process if it's still running 10s after the timeout.
+JOB_TIMEOUT_SEC="${JOB_TIMEOUT_SEC:-600}"
 
 # Example NCCL/other envs; add/remove as needed:
 export NCCL_DEBUG="${NCCL_DEBUG:-INFO}"
@@ -166,8 +172,14 @@ for combo in "${combinations[@]}"; do
       extras=($EXTRA_MPI_ARGS)
     fi
 
-    # Compose command
+    # Compose command with TIMEOUT
+    # We wrap mpirun in 'timeout'. 
+    # If it runs longer than JOB_TIMEOUT_SEC, it sends SIGTERM.
+    # If it ignores that for 10 more seconds, it sends SIGKILL (-k).
     mp_cmd=(
+      timeout 
+      -k "$((JOB_TIMEOUT_SEC + 10))" 
+      "$JOB_TIMEOUT_SEC"
       mpirun
       --tag-output
       --display-map
@@ -210,11 +222,10 @@ for combo in "${combinations[@]}"; do
   done
 
   if (( fail != 0 )); then
-    echo "Round $round_idx: one or more jobs failed (see logs in $LOGDIR)" >&2
-    # Decide whether to exit or continue:
-    # exit 1
+    echo "Round $round_idx: one or more jobs failed/timed-out (see logs in $LOGDIR)" >&2
+    # We continue to the next round even if jobs failed
   else
-    echo "Round $round_idx: all jobs completed."
+    echo "Round $round_idx: all jobs completed successfully."
   fi
 
   if (( ${#round_logs[@]} > 0 )); then
