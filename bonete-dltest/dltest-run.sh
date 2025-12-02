@@ -30,11 +30,12 @@ else
   echo "Warning: /data/dltest-logs/dl_unittest_bonete does not exist, skipping copy"
 fi
 
-cd $SCRIPT_DIR/dl_unittest_bonete || { echo "Failed to change directory to $SCRIPT_DIR/dl_unittest_bonete"; exit 1; }
+cd $SCRIPT_DIR || { echo "Failed to change directory to $SCRIPT_DIR"; exit 1; }
+echo "Changed directory to $SCRIPT_DIR"
 MASTER_ADDR=localhost MASTER_PORT=9500 PYTHONPATH=src torchrun --nproc_per_node=8 -m dl_unittest --test_plan 80gb-placeholder --iterations 30 2>&1 | tee $gcrnode.txt
 
-
-
-
+#copy $gcrnode.txt to DLTEST_LOG_DIR
+cp $gcrnode.txt $DLTEST_LOG_DIR/
+echo "DL UNIT TEST completed on $gcrnode. Logs copied to $DLTEST_LOG_DIR/$gcrnode.txt"
 
 
