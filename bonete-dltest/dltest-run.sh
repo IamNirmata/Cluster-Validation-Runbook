@@ -25,7 +25,7 @@ echo "################-------Starting DL UNIT TEST in $gcrnode -----------------
 if [[ -d "/data/dltest-logs/dl_unittest_bonete" ]]; then
   cp -r /data/dltest-logs/dl_unittest_bonete $SCRIPT_DIR
   echo "Copied /data/dltest-logs/dl_unittest_bonete to $SCRIPT_DIR"
-  ls -la $SCRIPT_DIR/dl_unittest_bonete
+  ls -la $SCRIPT_DIR
 else
   echo "Warning: /data/dltest-logs/dl_unittest_bonete does not exist, skipping copy"
 fi
