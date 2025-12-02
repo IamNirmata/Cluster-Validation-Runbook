@@ -1,7 +1,7 @@
 apiVersion: batch.volcano.sh/v1alpha1
 kind: Job
 metadata:
-  generateName: mpi-allpair-allreduce-hari-
+  generateName: gcr-dltest-
   namespace: gcr-admin-test1
 spec:
   queue: default
@@ -10,14 +10,13 @@ spec:
     ssh: []
     svc: []
     env: []
-    mpi: []
   tasks:
     - name: server
       replicas: 2
       template:
         metadata:
           labels:
-            app: allpair-mpi
+            app: gcr-dltest
             role: server
         spec:
           schedulerName: volcano
@@ -46,7 +45,7 @@ spec:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
                     matchLabels:
-                      app: allpair-mpi
+                      app: gcr-dltest
                   topologyKey: kubernetes.io/hostname
           containers:
             - name: server
@@ -86,10 +85,11 @@ spec:
                   ls -la /data
                   
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
-                  bash /opt/Cluster-Validation-Runbook/allpair/server.sh
+                  # bash /opt/Cluster-Validation-Runbook/allpair/server.sh
+
                   
                   echo "=== Allpair done, sleeping forever ==="
-                  # sleep infinity
+                  sleep infinity
               resources:
                 requests:
                   nvidia.com/gpu: "8"
