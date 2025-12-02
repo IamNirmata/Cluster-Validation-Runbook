@@ -36,6 +36,9 @@ ssh-keygen -A
 SSHD_PID=$!
 
 SERVER_HOST="$(tr ',' '\n' < /etc/volcano/VC_SERVER_HOSTS | head -n1)"
+echo "Waiting for server host to be reachable: ${SERVER_HOST}"
+
+
 if [[ -z "${SERVER_HOST}" ]]; then
   echo "VC_SERVER_HOSTS empty or missing" >&2
   exit 1

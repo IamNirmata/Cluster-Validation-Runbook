@@ -237,6 +237,11 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do
   echo "$host slots=8"
 done >> /opt/hostfile
 
+echo "Hostfile generated at /opt/hostfile"
+echo "#########################Hostfile#########################"
+cat /opt/hostfile
+echo "##########################################################"
+
 
 # Clone Cluster Validation Runbook repository if it is not already present
 if [[ ! -d /opt/Cluster-Validation-Runbook/.git ]]; then
@@ -293,7 +298,10 @@ for host in "${HOSTS[@]}"; do
 done
 
 echo "node_map.csv generated:"
+echo "##### Contents of $NODE_MAP_FILE #####"
 cat "$NODE_MAP_FILE"
+echo "##### End of $NODE_MAP_FILE #####"
+
 
 # Start a background process to update results.csv periodically
 (
