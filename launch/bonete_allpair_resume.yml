@@ -65,7 +65,7 @@ spec:
               volumeMounts:
                 - name: dshm
                   mountPath: /dev/shm
-                  
+
                 - name: data
                   mountPath: /data
                 - name: sys
@@ -90,7 +90,7 @@ spec:
                   bash /opt/Cluster-Validation-Runbook/allpair/server.sh
                   
                   echo "=== Allpair done, sleeping forever ==="
-                  sleep infinity
+                  # sleep infinity
               resources:
                 requests:
                   nvidia.com/gpu: "8"
@@ -174,7 +174,7 @@ spec:
                   bash /opt/Cluster-Validation-Runbook/allpair/client.sh
                   
                   echo "=== Client ready, sleeping forever ==="
-                  sleep infinity
+                  # sleep infinity
               resources:
                 requests:
                   nvidia.com/gpu: "8"
