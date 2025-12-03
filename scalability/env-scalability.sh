@@ -32,10 +32,6 @@ cat /opt/hostfile
 echo "--------------------------------"
 
 
-#logdirectory
-export testdir="/opt/Cluster-Validation-Runbook/scalability/logs"
-mkdir -p "$testdir"
-export LOG_DIR="$testdir"
 
 
 

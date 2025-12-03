@@ -2,8 +2,10 @@
 set -eo pipefail
 HOSTFILE="/opt/hostfile"
 NUM_NODES=$(wc -l < $HOSTFILE)
-LOG_DIR=${testdir:-"./allreduce_logs"} # Inherit LOG_DIR from run.sh or default
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S") # Use a timestamp for the txt file
+LOG_DIR=${LOG_DIR:-"./data/scalability-logs/$TIMESTAMP"} # Inherit LOG_DIR from environment or default
+echo "Using LOG_DIR: $LOG_DIR"
+
+echo "timezone is $TIMESTAMP"
 
 echo "=========================================================="
 echo "STARTING LATENCY TEST MATRIX (2 Bytes, $NUM_NODES nodes)"

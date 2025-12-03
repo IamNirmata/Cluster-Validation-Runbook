@@ -2,8 +2,9 @@
 set -eo pipefail
 HOSTFILE="/opt/hostfile"
 NUM_NODES=$(wc -l < $HOSTFILE)
-LOG_DIR=${testdir:-"./allreduce_logs"} # Inherit LOG_DIR from run.sh or default
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S") # Use a timestamp for the txt file
+LOG_DIR=${LOG_DIR:-"./data/scalability-logs/$TIMESTAMP"} # Inherit LOG_DIR from environment or default
+echo "Using LOG_DIR: $LOG_DIR"
+echo "timezone is $TIMESTAMP"
 
 echo "=========================================================="
 echo "STARTING BANDWIDTH TEST MATRIX (16 GB, $NUM_NODES nodes)"
@@ -67,6 +68,18 @@ export NCCL_COLLNET_ENABLE=0
 export NCCL_ALGO=Ring # Force Ring
 BW_T4=$(run_and_parse "SHARP Disabled (Ring)")
 
+# --- TEST 5 : SHARP Enabled + Default Algorithm ---
+export NCCL_SHARP_DISABLE=0
+export NCCL_COLLNET_ENABLE=1
+unset NCCL_ALGO # Use default algorithm
+BW_T5=$(run_and_parse "SHARP Enabled (Default Algo)")
+
+# --- TEST 6 : SHARP Disabled + Default Algorithm ---
+export NCCL_SHARP_DISABLE=1
+export NCCL_COLLNET_ENABLE=0
+unset NCCL_ALGO # Use default algorithm
+BW_T6=$(run_and_parse "SHARP Disabled (Default Algo)")
+
 
 echo "=========================================================="
 echo "BANDWIDTH TEST MATRIX COMPLETE"
@@ -79,12 +92,12 @@ echo ""
 echo "Creating bandwidth summary table at $LOG_FILE..."
 
 # Create header
-printf "| %-16s | %-15s | %-15s |\n" "SHARP Status" "Ring" "Tree" > $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Status" "Ring" "Tree" "Auto" > $LOG_FILE
 # Create separator
-printf "| %-16s | %-15s | %-15s |\n" "----------------" "---------------" "---------------" >> $LOG_FILE
-# Add data (T3/T4 are Ring, T1/T2 are Tree)
-printf "| %-16s | %-15s | %-15s |\n" "SHARP Enabled" "$BW_T3" "$BW_T1" >> $LOG_FILE
-printf "| %-16s | %-15s | %-15s |\n" "SHARP Disabled" "$BW_T4" "$BW_T2" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "----------------" "---------------" "---------------" "---------------" >> $LOG_FILE
+# Add data (T3/T4 are Ring, T1/T2 are Tree and T5/T6 are Auto)
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Enabled" "$BW_T3" "$BW_T1" "$BW_T5" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Disabled" "$BW_T4" "$BW_T2" "$BW_T6" >> $LOG_FILE
 
 echo ""
 echo "--- Bandwidth Summary Table ---"
