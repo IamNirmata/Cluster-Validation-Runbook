@@ -100,11 +100,7 @@ spec:
                   
                   echo "Making scripts executable..."
                   chmod +x *.sh
-
-                  bash ./latency.sh
-                  bash ./bw.sh
-                  bash ./scale.sh 10
-                  
+                  bash ./runall.sh
                   echo "Tests finished. Sleeping."
                   sleep 360000
               resources:
