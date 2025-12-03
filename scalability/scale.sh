@@ -10,7 +10,7 @@ TOTAL_NODES=$(wc -l < $HOSTFILE)
 
 # Read multiplication factor from 1st arg.
 # A default (10) is provided by the main run.sh
-MUL=$1
+MUL=$1 
 
 echo "=========================================================="
 echo "STARTING SCALABILITY BANDWIDTH & LATENCY TEST (SHARP Enabled)"

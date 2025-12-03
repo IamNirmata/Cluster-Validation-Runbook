@@ -103,7 +103,7 @@ spec:
 
                   bash ./latency.sh
                   bash ./bw.sh
-                  bash ./scale.sh
+                  bash ./scale.sh 2
                   
                   echo "Tests finished. Sleeping."
                   sleep 360000
