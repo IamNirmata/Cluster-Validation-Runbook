@@ -5,7 +5,7 @@ metadata:
   namespace: gcr-admin-test1
 spec:
   queue: default
-  minAvailable: 10
+  minAvailable: 479
   plugins:
     ssh: []
     svc: []
@@ -103,7 +103,7 @@ spec:
 
                   bash ./latency.sh
                   bash ./bw.sh
-                  bash ./scale.sh 2
+                  bash ./scale.sh 
                   
                   echo "Tests finished. Sleeping."
                   sleep 360000
@@ -119,7 +119,7 @@ spec:
                   memory: "1500Gi"
                   rdma/rdma_shared_device_a: "1"
     - name: client
-      replicas: 9
+      replicas: 478
       template:
         metadata:
           labels:
@@ -183,7 +183,7 @@ spec:
                     git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
                   # 2. Source the common setup script
                   # This installs/starts sshd
-                  source /opt/Cluster-Validation-Runbook/scalability/env.sh
+                  source /opt/Cluster-Validation-Runbook/scalability/env-scalability.sh
                   
                   echo "Worker ready. Sleeping."
                   sleep 360000
