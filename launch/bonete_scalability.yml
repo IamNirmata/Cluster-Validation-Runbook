@@ -102,7 +102,7 @@ spec:
                   chmod +x *.sh
                   bash ./runall.sh
                   echo "Tests finished. Sleeping."
-                  sleep 360000
+                  sleep 360
               resources:
                 requests:
                   nvidia.com/gpu: "8"
