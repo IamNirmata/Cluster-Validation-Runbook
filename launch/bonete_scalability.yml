@@ -5,7 +5,7 @@ metadata:
   namespace: gcr-admin-test1
 spec:
   queue: default
-  minAvailable: 475
+  minAvailable: 479
   plugins:
     ssh: []
     svc: []
@@ -115,7 +115,7 @@ spec:
                   memory: "1500Gi"
                   rdma/rdma_shared_device_a: "1"
     - name: client
-      replicas: 474
+      replicas: 478
       template:
         metadata:
           labels:
