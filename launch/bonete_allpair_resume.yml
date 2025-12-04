@@ -5,7 +5,7 @@ metadata:
   namespace: gcr-admin-test1
 spec:
   queue: default
-  minAvailable: 475
+  minAvailable: 479
   plugins:
     ssh: []
     svc: []
@@ -56,12 +56,12 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: spec.nodeName
-                - name: ALLPAIR_DEBUG
-                  value: "1"
+                # - name: ALLPAIR_DEBUG
+                #   value: "1"
                 # - name: LOGDIR
                 #   value: "/data/allpair-logs/20251202_051923"
-                - name: START_ROUND
-                  value: "0"
+                # - name: START_ROUND
+                #   value: "0"
               volumeMounts:
                 - name: dshm
                   mountPath: /dev/shm
@@ -103,7 +103,7 @@ spec:
                   memory: "1500Gi"
                   rdma/rdma_shared_device_a: "1"
     - name: client
-      replicas: 474
+      replicas: 478
       template:
         metadata:
           labels:
