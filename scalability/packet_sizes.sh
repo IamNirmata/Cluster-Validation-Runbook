@@ -10,28 +10,25 @@ mkdir -p "$LOG_DIR"
 RUN_LOG_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}.log"
 : > "$RUN_LOG_FILE"
 
+SUMMARY_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}_summary.txt"
+echo "Creating packet size summary table at $SUMMARY_FILE..."
+printf "| %-10s | %-18s | %-8s | %-15s | %-15s | %-15s |\n" \
+  "Nodes" "Packet Size" "Mode" "Avg Latency" "Alg BW" "Bus BW" > "$SUMMARY_FILE"
+printf "| %-10s | %-18s | %-8s | %-15s | %-15s | %-15s |\n" \
+  "----------" "------------------" "--------" "---------------" "---------------" "---------------" >> "$SUMMARY_FILE"
+
 # --- Node Sweep Config ---
-MAX_NODE_TARGET=479
 if [ "$NUM_NODES" -lt 2 ]; then
   echo "Need at least 2 hosts in $HOSTFILE; found $NUM_NODES" >&2
   exit 1
 fi
-if [ "$NUM_NODES" -le "$MAX_NODE_TARGET" ]; then
-  MAX_NODES=$NUM_NODES
-else
-  MAX_NODES=$MAX_NODE_TARGET
-fi
 declare -a NODE_COUNTS=()
 node_count=2
-while [ $node_count -le $MAX_NODES ]; do
+while [ $node_count -lt $NUM_NODES ]; do
   NODE_COUNTS+=("$node_count")
   node_count=$((node_count * 2))
 done
-last_index=$((${#NODE_COUNTS[@]} - 1))
-last_count=${NODE_COUNTS[$last_index]}
-if [ "$last_count" -ne "$MAX_NODES" ]; then
-  NODE_COUNTS+=("$MAX_NODES")
-fi
+NODE_COUNTS+=("$NUM_NODES")
 echo "Target node counts: ${NODE_COUNTS[*]}"
 
 TEMP_HOSTFILES=()
@@ -43,14 +40,23 @@ cleanup_hosts() {
 trap cleanup_hosts EXIT
 
 # --- Packet Size Sweep Config ---
-ELEMENT_SIZE_BYTES=2 # bfloat16 tensor elements
 MAX_PACKET_BYTES=$((16 * 1024 * 1024 * 1024))
-declare -a PACKET_SIZES_BYTES=()
+declare -a PACKET_SIZE_VALUES=()
 size_bytes=4
 while [ "$size_bytes" -le "$MAX_PACKET_BYTES" ]; do
-  PACKET_SIZES_BYTES+=("$size_bytes")
+  PACKET_SIZE_VALUES+=("$size_bytes")
   size_bytes=$((size_bytes * 2))
 done
+
+PACKET_SIZES_CSV=""
+for size in "${PACKET_SIZE_VALUES[@]}"; do
+  if [ -z "$PACKET_SIZES_CSV" ]; then
+    PACKET_SIZES_CSV="$size"
+  else
+    PACKET_SIZES_CSV+=",$size"
+  fi
+done
+export PACKET_SIZES_BYTES="$PACKET_SIZES_CSV"
 
 echo "=========================================================="
 echo "STARTING PACKET SIZE SWEEP (4 B -> 16 GB)"
@@ -62,8 +68,8 @@ MPI_CMD_BASE=(
   -bind-to none -mca pml ob1 -mca btl ^openib
   -x PATH -x LD_LIBRARY_PATH
   -x MASTER_ADDR -x MASTER_PORT
-  -x NUM_ELEMENTS
   -x NCCL_DEBUG
+  -x PACKET_SIZES_BYTES
 )
 
 export NCCL_DEBUG=INFO # Set to WARN to reduce log spam, INFO for details
@@ -119,22 +125,22 @@ run_and_parse() {
       cmd+=(-x "$var")
     fi
   done
-  cmd+=("python" "allreduce_benchmark.py")
+  cmd+=("python" "allreduce_packet_sizes.py")
 
-  local result=$("${cmd[@]}" 2>&1 | tee -a "$RUN_LOG_FILE" | tee /dev/stderr | grep "Avg Latency" | awk '{print $3 " " $4}' || true)
+  local tmp_output metrics_file
+  tmp_output=$(mktemp)
+  metrics_file=$(mktemp)
+  "${cmd[@]}" 2>&1 | tee -a "$RUN_LOG_FILE" | tee /dev/stderr | tee "$tmp_output" >/dev/null
 
-  if [ -z "$result" ]; then
-    echo "ERROR: Test '$test_name' failed to produce latency output." >&2
-    result="Failed"
+  grep '^METRIC|' "$tmp_output" > "$metrics_file" || true
+  if [ ! -s "$metrics_file" ]; then
+    echo "ERROR: Test '$test_name' failed to produce METRIC lines." >&2
   fi
 
-  echo "Result: $result" >&2
-  echo "$result"
+  cat "$metrics_file"
+  rm -f "$tmp_output" "$metrics_file"
 }
 
-declare -A RESULTS_TREE
-declare -A RESULTS_RING
-declare -A RESULTS_AUTO
 MODES=(tree ring auto)
 
 for node_count in "${NODE_COUNTS[@]}"; do
@@ -144,22 +150,58 @@ for node_count in "${NODE_COUNTS[@]}"; do
   TEMP_HOSTFILES+=("$current_hostfile")
   head -n "$node_count" "$HOSTFILE" > "$current_hostfile"
 
-  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
-    export NUM_ELEMENTS=$((packet_bytes / ELEMENT_SIZE_BYTES))
-    size_label=$(format_size "$packet_bytes")
-    echo ""
-    echo ">>> Packet Size: $size_label ($packet_bytes bytes, $NUM_ELEMENTS elements)"
+  unset NODE_RESULTS NODE_LABELS
+  declare -A NODE_RESULTS
+  declare -A NODE_LABELS
 
+  for mode in "${MODES[@]}"; do
+    configure_mode "$mode"
+    mode_label=${mode^}
+    echo ""
+    echo ">>> Running packet sweep for mode: $mode_label"
+    metrics_output=$(run_and_parse "$mode_label - ${node_count} nodes" "$current_hostfile")
+
+    while IFS= read -r metric_line; do
+      [ -z "$metric_line" ] && continue
+      IFS='|' read -r tag bytes label latency_val alg_val bus_val <<< "$metric_line"
+      [ "$tag" != "METRIC" ] && continue
+
+      NODE_RESULTS["$bytes|$mode"]="$label|$latency_val|$alg_val|$bus_val"
+      if [ -z "${NODE_LABELS[$bytes]+x}" ]; then
+        NODE_LABELS["$bytes"]="$label"
+      fi
+    done <<< "$metrics_output"
+  done
+
+  mapfile -t NODE_PACKET_ORDER < <(printf "%s\n" "${!NODE_LABELS[@]}" | sort -n)
+  if [ ${#NODE_PACKET_ORDER[@]} -eq 0 ]; then
+    echo "WARNING: No packet metrics captured for ${node_count} nodes" >&2
+    continue
+  fi
+
+  echo ""
+  echo "--- Summary for $node_count nodes ---"
+  printf "| %-10s | %-18s | %-8s | %-15s | %-15s | %-15s |\n" \
+    "Nodes" "Packet Size" "Mode" "Avg Latency" "Alg BW" "Bus BW"
+  printf "| %-10s | %-18s | %-8s | %-15s | %-15s | %-15s |\n" \
+    "----------" "------------------" "--------" "---------------" "---------------" "---------------"
+
+  for packet_bytes in "${NODE_PACKET_ORDER[@]}"; do
+    size_label=${NODE_LABELS[$packet_bytes]:-$(format_size "$packet_bytes")}
     for mode in "${MODES[@]}"; do
-      configure_mode "$mode"
       mode_label=${mode^}
-      latency=$(run_and_parse "$size_label - $mode_label - ${node_count} nodes" "$current_hostfile")
-      key="${node_count}|${packet_bytes}"
-      case $mode in
-        tree) RESULTS_TREE["$key"]="$latency" ;;
-        ring) RESULTS_RING["$key"]="$latency" ;;
-        auto) RESULTS_AUTO["$key"]="$latency" ;;
-      esac
+      metrics="${NODE_RESULTS["$packet_bytes|$mode"]}"
+      local_label="$size_label"
+      latency="N/A"; alg_bw="N/A"; bus_bw="N/A"
+      if [ -n "$metrics" ]; then
+        IFS='|' read -r label_text latency_val alg_val bus_val <<< "$metrics"
+        local_label="$label_text"
+        latency="$latency_val us"
+        alg_bw="$alg_val GB/s"
+        bus_bw="$bus_val GB/s"
+      fi
+      printf "| %-10s | %-18s | %-8s | %-15s | %-15s | %-15s |\n" \
+        "$node_count" "$local_label" "$mode_label" "$latency" "$alg_bw" "$bus_bw" | tee -a "$SUMMARY_FILE"
     done
   done
 done
@@ -168,26 +210,7 @@ echo "=========================================================="
 echo "PACKET SIZE SWEEP COMPLETE"
 echo "=========================================================="
 
-SUMMARY_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}_summary.txt"
 echo ""
-echo "Creating packet size summary table at $SUMMARY_FILE..."
-
-printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "Nodes" "Packet Size" "Tree" "Ring" "Auto" > "$SUMMARY_FILE"
-printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "----------" "------------------" "---------------" "---------------" "---------------" >> "$SUMMARY_FILE"
-for node_count in "${NODE_COUNTS[@]}"; do
-  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
-    size_label=$(format_size "$packet_bytes")
-    key="${node_count}|${packet_bytes}"
-    printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" \
-      "$node_count" \
-      "$size_label" \
-      "${RESULTS_TREE[$key]:-N/A}" \
-      "${RESULTS_RING[$key]:-N/A}" \
-      "${RESULTS_AUTO[$key]:-N/A}" >> "$SUMMARY_FILE"
-  done
-done
-
-echo ""
-echo "--- Packet Size Summary Table ---"
+echo "--- Packet Size Summary Table (All Nodes) ---"
 cat "$SUMMARY_FILE"
 echo "---------------------------"
