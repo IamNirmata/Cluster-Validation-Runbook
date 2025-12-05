@@ -122,9 +122,6 @@ run_and_parse() {
   echo "$result"
 }
 
-declare -A RESULTS_TREE
-declare -A RESULTS_RING
-declare -A RESULTS_AUTO
 MODES=(tree ring auto)
 
 for node_count in "${NODE_COUNTS[@]}"; do
@@ -133,6 +130,11 @@ for node_count in "${NODE_COUNTS[@]}"; do
   current_hostfile=$(mktemp)
   TEMP_HOSTFILES+=("$current_hostfile")
   head -n "$node_count" "$HOSTFILE" > "$current_hostfile"
+
+  unset NODE_RESULTS_TREE NODE_RESULTS_RING NODE_RESULTS_AUTO
+  declare -A NODE_RESULTS_TREE
+  declare -A NODE_RESULTS_RING
+  declare -A NODE_RESULTS_AUTO
 
   for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
     export NUM_ELEMENTS=$((packet_bytes / ELEMENT_SIZE_BYTES))
@@ -144,15 +146,32 @@ for node_count in "${NODE_COUNTS[@]}"; do
       configure_mode "$mode"
       mode_label=${mode^}
       latency=$(run_and_parse "$size_label - $mode_label - ${node_count} nodes" "$current_hostfile")
-      key="${node_count}|${packet_bytes}"
+      key="$packet_bytes"
       case $mode in
-        tree) RESULTS_TREE["$key"]="$latency" ;;
-        ring) RESULTS_RING["$key"]="$latency" ;;
-        auto) RESULTS_AUTO["$key"]="$latency" ;;
+        tree) NODE_RESULTS_TREE["$key"]="$latency" ;;
+        ring) NODE_RESULTS_RING["$key"]="$latency" ;;
+        auto) NODE_RESULTS_AUTO["$key"]="$latency" ;;
       esac
     done
   done
+
+  echo ""
+  echo "--- Summary for $node_count nodes ---"
+  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
+    size_label=$(format_size "$packet_bytes")
+    printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" \
+      "$node_count" \
+      "$size_label" \
+      "${NODE_RESULTS_TREE[$packet_bytes]:-N/A}" \
+      "${NODE_RESULTS_RING[$packet_bytes]:-N/A}" \
+      "${NODE_RESULTS_AUTO[$packet_bytes]:-N/A}" | tee -a "$SUMMARY_FILE"
+  done
 done
+
+echo ""
+echo "--- Packet Size Summary Table (All Nodes) ---"
+cat "$SUMMARY_FILE"
+echo "---------------------------"
 
 echo "=========================================================="
 echo "PACKET SIZE SWEEP COMPLETE"
@@ -161,23 +180,5 @@ echo "=========================================================="
 SUMMARY_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}_summary.txt"
 echo ""
 echo "Creating packet size summary table at $SUMMARY_FILE..."
-
 printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "Nodes" "Packet Size" "Tree" "Ring" "Auto" > "$SUMMARY_FILE"
 printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "----------" "------------------" "---------------" "---------------" "---------------" >> "$SUMMARY_FILE"
-for node_count in "${NODE_COUNTS[@]}"; do
-  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
-    size_label=$(format_size "$packet_bytes")
-    key="${node_count}|${packet_bytes}"
-    printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" \
-      "$node_count" \
-      "$size_label" \
-      "${RESULTS_TREE[$key]:-N/A}" \
-      "${RESULTS_RING[$key]:-N/A}" \
-      "${RESULTS_AUTO[$key]:-N/A}" >> "$SUMMARY_FILE"
-  done
-done
-
-echo ""
-echo "--- Packet Size Summary Table ---"
-cat "$SUMMARY_FILE"
-echo "---------------------------"
