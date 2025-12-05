@@ -102,8 +102,8 @@ configure_mode() {
       ;;
     auto)
       unset NCCL_ALGO
-      unset NCCL_SHARP_DISABLE
-      unset NCCL_COLLNET_ENABLE
+      export NCCL_SHARP_DISABLE=0
+      export NCCL_COLLNET_ENABLE=1
       ;;
     *)
       echo "Unknown NCCL mode: $mode" >&2
