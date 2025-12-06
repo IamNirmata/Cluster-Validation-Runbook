@@ -50,7 +50,6 @@ spec:
                   topologyKey: kubernetes.io/hostname
           containers:
             - name: server
-              # Using the standard pytorch container (NeMo installation handled in script)
               image: nvcr.io/nvidia/pytorch:25.10-py3 
               env:
                 - name: gcrnode
@@ -78,30 +77,25 @@ spec:
                   # 1. Clone Repo
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
                   
-                  # 2. Source common setup
-                  source /opt/Cluster-Validation-Runbook/scalability/env-nemo.sh
+                  # 2. Source common setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/env-nemo.sh
 
-                  # 3. Source Server setup (Sets LOG_DIR)
-                  source /opt/Cluster-Validation-Runbook/scalability/server-nemo.sh
+                  # 3. Source Server setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/server-nemo.sh
                   
-                  # 4. Start Logging to File
-                  # This redirects all future commands' stdout/stderr to both console and file
+                  # 4. Logging Setup
                   exec > >(tee -a "${LOG_DIR}/console_output.log") 2>&1
-                  echo "Logging started to ${LOG_DIR}"
-
-                  # 5. Wait for workers
-                  bash /opt/Cluster-Validation-Runbook/scalability/wait-for-ssh-nemo.sh
                   
-                  # 6. Run NeMo Benchmark
+                  # 5. Wait for workers (UPDATED PATH)
+                  bash /opt/Cluster-Validation-Runbook/nemo-bench/wait-for-ssh-nemo.sh
+                  
+                  # 6. Run NeMo Benchmark (UPDATED PATH)
                   echo "Starting NeMo Benchmark..."
-                  cd /opt/Cluster-Validation-Runbook/scalability
+                  cd /opt/Cluster-Validation-Runbook/nemo-bench
                   chmod +x *.sh
-                  
-                  # Run the benchmark script
                   bash nemo-benchmark.sh
                   
-                  echo "Benchmark finished. Logs are in ${LOG_DIR}"
-                  sleep 3600
+                  # Trap in server-nemo.sh handles the signal file on exit
               resources:
                 requests:
                   nvidia.com/gpu: "8"
@@ -174,11 +168,13 @@ spec:
                   set -xeo pipefail
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
                   
-                  # Source the renamed env file
-                  source /opt/Cluster-Validation-Runbook/scalability/env-nemo.sh
+                  # 1. Environment Setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/env-nemo.sh
                   
-                  echo "Worker ready. Sleeping."
-                  sleep 360000
+                  # 2. Run Client Logic (UPDATED PATH)
+                  cd /opt/Cluster-Validation-Runbook/nemo-bench
+                  chmod +x client-nemo.sh
+                  bash client-nemo.sh
               resources:
                 requests:
                   nvidia.com/gpu: "8"
