@@ -42,8 +42,8 @@ GLOBAL_BATCH_SIZE=$((WORLD_SIZE * MICRO_BATCH_SIZE))
 echo ">>> Starting MPI Run..."
 echo "Results will be saved to: $LOG_DIR"
 
-# Run MPI
-# We add `tee` here as a backup to capture specifically the mpirun output 
+# EXECUTION: This is MPI
+# We use 'tee' to capture stdout/stderr to the log file as well as console
 mpirun --allow-run-as-root \
   --hostfile $HOSTFILE \
   -np $WORLD_SIZE \
