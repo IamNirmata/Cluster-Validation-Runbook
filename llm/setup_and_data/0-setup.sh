@@ -29,7 +29,7 @@ pip install -U datasets --break-system-packages
 pip install -U wandb transformers peft bitsandbytes accelerate huggingface_hub trl --break-system-packages
 python -m pip install --upgrade pip --break-system-packages
 
-chmod +x $codedir/tools/*.sh
+# chmod +x $codedir/tools/*.sh
 
 
 
