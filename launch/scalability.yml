@@ -1,0 +1,159 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  generateName: hari-gcr-cluster-validation-scalability-
+  namespace: gcr-gcr-admin-test1
+spec:
+  queue: default
+  minAvailable: 3 # 1 server + 2 clients
+  plugins:
+    ssh: []   # passwordless SSH
+    svc: []   # creates VC_SERVER_HOSTS and VC_CLIENT_HOSTS
+    env: []   # VC_* envs
+    mpi: ["--master=server", "--worker=client"]
+  tasks:
+    - name: server
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: allreduce-mpi
+            role: server
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: allreduce-mpi
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: server
+              image: nvcr.io/nvidia/pytorch:25.06-py3
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash","-lc"]
+              args:
+                - |
+                  set -xeo pipefail
+                  
+                  # 1. Clone Repo
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  
+                  # 2.1 Source the common setup script
+                  # This installs/starts sshd AND exports MASTER_ADDR/PORT
+                  source /opt/Cluster-Validation-Runbook/scalability/env-scalability.sh
+
+                  # 2.2 Server-specific setup
+                  echo "Master address is $MASTER_ADDR"
+                  echo "Master port is $MASTER_PORT"
+                  source /opt/Cluster-Validation-Runbook/scalability/server-scalability.sh
+                  
+                  # 3. Wait for workers to be ready for SSH
+                  bash /opt/Cluster-Validation-Runbook/scalability/wait-for-ssh.sh
+                  
+                  # 4. Run the main test suite
+                  echo "Starting Test Suite..."
+                  cd /opt/Cluster-Validation-Runbook/scalability
+                  
+                  echo "Making scripts executable..."
+                  chmod +x *.sh
+
+                  bash ./latency.sh
+                  bash ./bw.sh
+                  bash ./scale.sh
+                  
+                  echo "Tests finished. Sleeping."
+                  sleep 360000
+
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"
+    
+    - name: client
+      replicas: 9
+      template:
+        metadata:
+          labels:
+            app: allreduce-mpi
+            role: client
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 100Gi
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: allreduce-mpi
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: client
+              image: nvcr.io/nvidia/pytorch:25.06-py3
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash","-lc"]
+              args:
+                - |
+                  set -xeo pipefail
+                  # 1. Clone Repo
+                    git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  # 2. Source the common setup script
+                  # This installs/starts sshd
+                  source /opt/Cluster-Validation-Runbook/scalability/env.sh
+                  
+                  echo "Worker ready. Sleeping."
+                  sleep 360000
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "180"
+                  memory: "2500Gi"
+                  rdma/rdma_shared_device_a: "1"

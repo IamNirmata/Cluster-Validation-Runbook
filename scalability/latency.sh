@@ -1,0 +1,101 @@
+#!/bin/bash
+set -eo pipefail
+HOSTFILE="/opt/hostfile"
+NUM_NODES=$(wc -l < $HOSTFILE)
+LOG_DIR=${LOG_DIR:-"/data/scalability-logs/$TIMESTAMP"} # Inherit LOG_DIR from environment or default
+echo "Using LOG_DIR: $LOG_DIR"
+
+echo "timestamp is $TIMESTAMP"
+
+echo "=========================================================="
+echo "STARTING LATENCY TEST MATRIX (2 Bytes, $NUM_NODES nodes)"
+echo "=========================================================="
+
+# --- MPI Base Command ---
+# We export variables from this script, so mpirun -x just needs to list them
+MPI_CMD="mpirun --allow-run-as-root --hostfile $HOSTFILE \
+       -bind-to none -mca pml ob1 -mca btl ^openib \
+       -x PATH -x LD_LIBRARY_PATH \
+       -x MASTER_ADDR -x MASTER_PORT \
+       -x NUM_ELEMENTS \
+       -x NCCL_SHARP_DISABLE -x NCCL_COLLNET_ENABLE \
+       -x NCCL_DEBUG -x NCCL_ALGO \
+       python allreduce_benchmark.py"
+
+# Set message size for all latency tests
+export NUM_ELEMENTS=1
+export NCCL_DEBUG=INFO # Set to WARN to reduce log spam, INFO for details
+
+# --- Function to run test and extract latency ---
+run_and_parse() {
+  local test_name=$1
+  # --- MODIFICATION: Print all status messages to stderr (>&2) ---
+  echo "" >&2
+  echo "--- RUNNING: $test_name ---" >&2
+  
+  # Run command, tee output to stderr.
+  # Grep for Avg Latency, awk to get the value (col 3) and unit (col 4)
+  # The 'local result=' line only captures stdout from the pipe.
+  local result=$($MPI_CMD 2>&1 | tee /dev/stderr | grep "Avg Latency" | awk '{print $3 " " $4}')
+  
+  if [ -z "$result" ]; then
+    echo "ERROR: Test '$test_name' failed to produce latency output." >&2
+    result="Failed"
+  fi
+  
+  echo "Result: $result" >&2
+  # --- END MODIFICATION ---
+
+  echo "$result" # This is the *only* line that goes to stdout and is captured
+}
+
+# --- TEST 1: SHARP Enabled + Tree Algorithm ---
+export NCCL_SHARP_DISABLE=0
+export NCCL_COLLNET_ENABLE=1
+export NCCL_ALGO=Tree # Force Tree
+LATENCY_T1=$(run_and_parse "SHARP Enabled (Tree/CollNet)")
+
+# --- TEST 2: SHARP Disabled + Tree Algorithm ---
+export NCCL_SHARP_DISABLE=1
+export NCCL_COLLNET_ENABLE=0
+export NCCL_ALGO=Tree # Force Tree
+LATENCY_T2=$(run_and_parse "SHARP Disabled (Tree)")
+
+# --- TEST 3: SHARP Enabled + Ring Algorithm ---
+export NCCL_SHARP_DISABLE=0 # Flag is set, but ALGO=Ring overrides it
+export NCCL_COLLNET_ENABLE=1
+export NCCL_ALGO=Ring # Force Ring
+LATENCY_T3=$(run_and_parse "SHARP Enabled (Ring)")
+
+# --- TEST 4: SHARP Disabled + Ring Algorithm ---
+export NCCL_SHARP_DISABLE=1
+export NCCL_COLLNET_ENABLE=0
+export NCCL_ALGO=Ring # Force Ring
+LATENCY_T4=$(run_and_parse "SHARP Disabled (Ring)")
+
+
+echo "=========================================================="
+echo "LATENCY TEST MATRIX COMPLETE"
+echo "=========================================================="
+
+# --- Generate Table ---
+# Make sure LOG_DIR exists (it should be created by run.sh, but good to check)
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/latency_${TIMESTAMP}.txt"
+echo ""
+echo "Creating latency summary table at $LOG_FILE..."
+
+# --- MODIFIED TABLE GENERATION ---
+# Create header
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Status" "Ring" "Tree" > $LOG_FILE
+# Create separator
+printf "| %-16s | %-15s | %-15s |\n" "----------------" "---------------" "---------------" >> $LOG_FILE
+# Add data
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Enabled" "$LATENCY_T3" "$LATENCY_T1" >> $LOG_FILE
+printf "| %-16s | %-15s | %-15s |\n" "SHARP Disabled" "$LATENCY_T4" "$LATENCY_T2" >> $LOG_FILE
+# --- END MODIFICATION ---
+
+echo ""
+echo "--- Latency Summary Table ---"
+cat $LOG_FILE
+echo "---------------------------"

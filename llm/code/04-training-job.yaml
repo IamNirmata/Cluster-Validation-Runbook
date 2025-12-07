@@ -1,0 +1,120 @@
+# PyTorchJob that launches torchrun for two pods (master + worker) with eight
+# processes per node. The command clones the repository and then executes the
+# simplified fine-tuning script with torchrun so that each GPU gets its own
+# process.
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: llama3-finetune-job
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 3200Gi
+            - name: external-storage
+              persistentVolumeClaim:
+                claimName: external-storage-persistent-volumeclaim
+          containers:
+            - name: pytorch
+              image: nvcr.io/nvidia/pytorch:24.07-py3
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -lc
+              args:
+                - |
+                  set -euxo pipefail
+                  if [ ! -d /workspace/distrbuted_training_tools ]; then
+                    git clone https://github.com/IamNirmata/distrbuted_training_tools.git /workspace/distrbuted_training_tools
+                  fi
+                  cd /workspace/distrbuted_training_tools
+                  python -m pip install --upgrade pip
+                  python -m pip install --no-cache-dir -r llm_finetune/setup_and_data/requirements.txt
+                  torchrun \
+                    --nproc_per_node=8 \
+                    --nnodes=2 \
+                    --node_rank=0 \
+                    --master_addr=llama3-finetune-job-master-0 \
+                    --master_port=29500 \
+                    llm_finetune/setup_and_data/train.py
+              env:
+                - name: WANDB_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: wandb-secret
+                      key: api_key
+                - name: HF_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hf-secret
+                      key: token
+              resources:
+                limits:
+                  nvidia.com/gpu: 8
+              volumeMounts:
+                - name: external-storage
+                  mountPath: /mnt/data
+                - name: dshm
+                  mountPath: /dev/shm
+    Worker:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 3200Gi
+            - name: external-storage
+              persistentVolumeClaim:
+                claimName: external-storage-persistent-volumeclaim
+          containers:
+            - name: pytorch
+              image: nvcr.io/nvidia/pytorch:24.07-py3
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -lc
+              args:
+                - |
+                  set -euxo pipefail
+                  if [ ! -d /workspace/distrbuted_training_tools ]; then
+                    git clone https://github.com/IamNirmata/distrbuted_training_tools.git /workspace/distrbuted_training_tools
+                  fi
+                  cd /workspace/distrbuted_training_tools
+                  python -m pip install --upgrade pip
+                  python -m pip install --no-cache-dir -r llm_finetune/setup_and_data/requirements.txt
+                  torchrun \
+                    --nproc_per_node=8 \
+                    --nnodes=2 \
+                    --node_rank=1 \
+                    --master_addr=llama3-finetune-job-master-0 \
+                    --master_port=29500 \
+                    llm_finetune/setup_and_data/train.py
+              env:
+                - name: WANDB_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: wandb-secret
+                      key: api_key
+                - name: HF_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hf-secret
+                      key: token
+              resources:
+                limits:
+                  nvidia.com/gpu: 8
+              volumeMounts:
+                - name: external-storage
+                  mountPath: /mnt/data
+                - name: dshm
+                  mountPath: /dev/shm

@@ -1,0 +1,184 @@
+#!/bin/bash
+set -eo pipefail
+HOSTFILE="/opt/hostfile"
+NUM_NODES=$(wc -l < "$HOSTFILE")
+LOG_DIR=${LOG_DIR:-"/data/scalability-logs/$TIMESTAMP"} # Inherit LOG_DIR from environment or default
+echo "Using LOG_DIR: $LOG_DIR"
+
+echo "timestamp is $TIMESTAMP"
+mkdir -p "$LOG_DIR"
+RUN_LOG_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}.log"
+: > "$RUN_LOG_FILE"
+
+# --- Node Sweep Config ---
+if [ "$NUM_NODES" -lt 2 ]; then
+  echo "Need at least 2 hosts in $HOSTFILE; found $NUM_NODES" >&2
+  exit 1
+fi
+declare -a NODE_COUNTS=()
+node_count=2
+while [ $node_count -lt $NUM_NODES ]; do
+  NODE_COUNTS+=("$node_count")
+  node_count=$((node_count * 2))
+done
+NODE_COUNTS+=("$NUM_NODES")
+echo "Target node counts: ${NODE_COUNTS[*]}"
+
+TEMP_HOSTFILES=()
+cleanup_hosts() {
+  for file in "${TEMP_HOSTFILES[@]}"; do
+    [ -n "$file" ] && [ -f "$file" ] && rm -f "$file"
+  done
+}
+trap cleanup_hosts EXIT
+
+# --- Packet Size Sweep Config ---
+ELEMENT_SIZE_BYTES=2 # bfloat16 tensor elements
+MAX_PACKET_BYTES=$((16 * 1024 * 1024 * 1024))
+declare -a PACKET_SIZES_BYTES=()
+size_bytes=4
+while [ "$size_bytes" -le "$MAX_PACKET_BYTES" ]; do
+  PACKET_SIZES_BYTES+=("$size_bytes")
+  size_bytes=$((size_bytes * 2))
+done
+
+echo "=========================================================="
+echo "STARTING PACKET SIZE SWEEP (4 B -> 16 GB)"
+echo "=========================================================="
+
+# --- MPI Base Command ---
+MPI_CMD_BASE=(
+  mpirun --allow-run-as-root
+  -bind-to none -mca pml ob1 -mca btl ^openib
+  -x PATH -x LD_LIBRARY_PATH
+  -x MASTER_ADDR -x MASTER_PORT
+  -x NUM_ELEMENTS
+  -x NCCL_DEBUG
+)
+
+export NCCL_DEBUG=INFO # Set to WARN to reduce log spam, INFO for details
+
+# --- Helpers ---
+format_size() {
+  local bytes=$1
+  local units=(B KB MB GB)
+  local idx=0
+  local value=$bytes
+  while [ "$value" -ge 1024 ] && [ $idx -lt 3 ]; do
+    value=$((value / 1024))
+    idx=$((idx + 1))
+  done
+  echo "$value ${units[$idx]}"
+}
+
+configure_mode() {
+  local mode=$1
+  case $mode in
+    tree)
+      export NCCL_ALGO=Tree
+      export NCCL_SHARP_DISABLE=0
+      export NCCL_COLLNET_ENABLE=1
+      ;;
+    ring)
+      export NCCL_ALGO=Ring
+      export NCCL_SHARP_DISABLE=0
+      export NCCL_COLLNET_ENABLE=0
+      ;;
+    auto)
+      unset NCCL_ALGO
+      unset NCCL_SHARP_DISABLE
+      unset NCCL_COLLNET_ENABLE
+      ;;
+    *)
+      echo "Unknown NCCL mode: $mode" >&2
+      exit 1
+      ;;
+  esac
+}
+
+# --- Function to run test and extract latency ---
+run_and_parse() {
+  local test_name=$1
+  local hostfile=$2
+  echo "" >&2
+  echo "--- RUNNING: $test_name ---" >&2
+
+  local cmd=("${MPI_CMD_BASE[@]}" --hostfile "$hostfile")
+  for var in NCCL_SHARP_DISABLE NCCL_COLLNET_ENABLE NCCL_ALGO; do
+    if [ -n "${!var+x}" ]; then
+      cmd+=(-x "$var")
+    fi
+  done
+  cmd+=("python" "allreduce_benchmark.py")
+
+  local result=$("${cmd[@]}" 2>&1 | tee -a "$RUN_LOG_FILE" | tee /dev/stderr | grep "Avg Latency" | awk '{print $3 " " $4}' || true)
+
+  if [ -z "$result" ]; then
+    echo "ERROR: Test '$test_name' failed to produce latency output." >&2
+    result="Failed"
+  fi
+
+  echo "Result: $result" >&2
+  echo "$result"
+}
+
+MODES=(tree ring auto)
+
+for node_count in "${NODE_COUNTS[@]}"; do
+  echo ""
+  echo "================ Node Count: $node_count ================"
+  current_hostfile=$(mktemp)
+  TEMP_HOSTFILES+=("$current_hostfile")
+  head -n "$node_count" "$HOSTFILE" > "$current_hostfile"
+
+  unset NODE_RESULTS_TREE NODE_RESULTS_RING NODE_RESULTS_AUTO
+  declare -A NODE_RESULTS_TREE
+  declare -A NODE_RESULTS_RING
+  declare -A NODE_RESULTS_AUTO
+
+  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
+    export NUM_ELEMENTS=$((packet_bytes / ELEMENT_SIZE_BYTES))
+    size_label=$(format_size "$packet_bytes")
+    echo ""
+    echo ">>> Packet Size: $size_label ($packet_bytes bytes, $NUM_ELEMENTS elements)"
+
+    for mode in "${MODES[@]}"; do
+      configure_mode "$mode"
+      mode_label=${mode^}
+      latency=$(run_and_parse "$size_label - $mode_label - ${node_count} nodes" "$current_hostfile")
+      key="$packet_bytes"
+      case $mode in
+        tree) NODE_RESULTS_TREE["$key"]="$latency" ;;
+        ring) NODE_RESULTS_RING["$key"]="$latency" ;;
+        auto) NODE_RESULTS_AUTO["$key"]="$latency" ;;
+      esac
+    done
+  done
+
+  echo ""
+  echo "--- Summary for $node_count nodes ---"
+  for packet_bytes in "${PACKET_SIZES_BYTES[@]}"; do
+    size_label=$(format_size "$packet_bytes")
+    printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" \
+      "$node_count" \
+      "$size_label" \
+      "${NODE_RESULTS_TREE[$packet_bytes]:-N/A}" \
+      "${NODE_RESULTS_RING[$packet_bytes]:-N/A}" \
+      "${NODE_RESULTS_AUTO[$packet_bytes]:-N/A}" | tee -a "$SUMMARY_FILE"
+  done
+done
+
+echo ""
+echo "--- Packet Size Summary Table (All Nodes) ---"
+cat "$SUMMARY_FILE"
+echo "---------------------------"
+
+echo "=========================================================="
+echo "PACKET SIZE SWEEP COMPLETE"
+echo "=========================================================="
+
+SUMMARY_FILE="$LOG_DIR/packet_sizes_${TIMESTAMP}_summary.txt"
+echo ""
+echo "Creating packet size summary table at $SUMMARY_FILE..."
+printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "Nodes" "Packet Size" "Tree" "Ring" "Auto" > "$SUMMARY_FILE"
+printf "| %-10s | %-18s | %-15s | %-15s | %-15s |\n" "----------" "------------------" "---------------" "---------------" "---------------" >> "$SUMMARY_FILE"

@@ -1,0 +1,183 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  generateName: mpi-allpair-allreduce-hari-
+  namespace: gcr-admin-test1
+spec:
+  queue: default
+  minAvailable: 479
+  plugins:
+    ssh: []
+    svc: []
+    env: []
+    mpi : ["--master=server", "--worker=client"]
+  tasks:
+    - name: server
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: allpair-mpi
+            role: server
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-vast-gcr-admin-test1
+            - name: sys
+              hostPath:
+                path: /sys
+                type: Directory
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: allpair-mpi
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: server
+              image: nvcr.io/nvidia/pytorch:25.10-py3
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: ALLPAIR_DEBUG
+                  value: "1"
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: data
+                  mountPath: /data
+                - name: sys
+                  mountPath: /sys
+                  readOnly: true
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -eo pipefail
+                  echo "=== Server Node ==="
+                  hostname
+                  nvidia-smi
+                  
+                  echo "=== PVC Check ==="
+                  df -h /data
+                  ls -la /data
+                  
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  bash /opt/Cluster-Validation-Runbook/allpair/server.sh
+                  
+                  echo "=== Allpair done, sleeping forever ==="
+                  sleep infinity
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+    - name: client
+      replicas: 478
+      template:
+        metadata:
+          labels:
+            app: allpair-mpi
+            role: client
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-vast-gcr-admin-test1
+            - name: sys
+              hostPath:
+                path: /sys
+                type: Directory
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: allpair-mpi
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: client
+              image: nvcr.io/nvidia/pytorch:25.10-py3
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: ALLPAIR_DEBUG
+                  value: "1"
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: data
+                  mountPath: /data
+                - name: sys
+                  mountPath: /sys
+                  readOnly: true
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -eo pipefail
+                  echo "=== Client Node ==="
+                  hostname
+                  nvidia-smi
+                  
+                  echo "=== PVC Check ==="
+                  df -h /data
+
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                  bash /opt/Cluster-Validation-Runbook/allpair/client.sh
+                  
+                  echo "=== Client ready, sleeping forever ==="
+                  sleep infinity
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"

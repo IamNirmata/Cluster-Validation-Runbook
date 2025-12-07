@@ -1,0 +1,1 @@
+cd /data/Cluster-Validation-Runbook && (git checkout main || git checkout master) && git pull

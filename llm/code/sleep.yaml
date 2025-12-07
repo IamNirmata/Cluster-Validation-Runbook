@@ -1,0 +1,182 @@
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+# kind: Job
+metadata:
+  name: llama3-finetune-sleep-job
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                # Optional: limit tmpfs size; remove if your cluster disallows it
+                sizeLimit: 3200Gi
+            - name: external-storage
+              persistentVolumeClaim:
+                claimName: external-storage-persistent-volumeclaim
+          containers:
+            - name: pytorch
+              image: nvcr.io/nvidia/pytorch:24.07-py3
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  echo "Worker started"
+                  git clone https://github.com/IamNirmata/distrbuted_training_tools.git /workspace/distrbuted_training_tools
+                  sleep 36000
+              volumeMounts:
+                - name: external-storage
+                  mountPath: /mnt/data
+                - name: dshm
+                  mountPath: /dev/shm
+              env:
+                - name: WANDB_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: wandb-secret
+                      key: api_key
+                - name: HF_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hf-secret
+                      key: token
+              resources:
+                limits:
+                  nvidia.com/gpu: 8
+
+    Worker:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        spec:
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 3200Gi
+            - name: external-storage
+              persistentVolumeClaim:
+                claimName: external-storage-persistent-volumeclaim
+          containers:
+            - name: pytorch
+              image: nvcr.io/nvidia/pytorch:24.07-py3
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  echo "Worker started"
+                  git clone https://github.com/IamNirmata/distrbuted_training_tools.git /workspace/distrbuted_training_tools
+                  sleep 36000
+              volumeMounts:
+                - name: external-storage
+                  mountPath: /mnt/data
+                - name: dshm
+                  mountPath: /dev/shm
+              env:
+                - name: WANDB_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: wandb-secret
+                      key: api_key
+                - name: HF_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: hf-secret
+                      key: token
+              resources:
+                limits:
+                  nvidia.com/gpu: 8
+
+
+
+
+
+
+
+
+
+# apiVersion: "kubeflow.org/v1"
+# kind: PyTorchJob
+# metadata:
+#   name: "llama3-finetune-sleep-job"
+# spec:
+#   pytorchReplicaSpecs:
+#     Master:
+#       replicas: 1
+#       restartPolicy: OnFailure
+#       template:
+#         spec:
+#           volumes: 
+#             - name: dshm
+#               emptyDir: {}
+#               medium: Memory
+#               sizeLimit: "3200Gi"
+#             - name: external-storage
+#               persistentVolumeClaim:
+#                 claimName: external-storage-persistent-volumeclaim
+#           containers:
+#             - name: pytorch
+#               image: nvcr.io/nvidia/pytorch:24.07-py3
+#               imagePullPolicy: IfNotPresent
+#               command: ["sleep", "36000"] # sleep 1h
+#               volumeMounts: 
+#                 - name: external-storage # Must match the volume name above
+#                   mountPath: "/mnt/data" # Path inside the container
+#                 - name: dshm
+#                   mountPath: /dev/shm
+#               env:
+#                 - name: WANDB_API_KEY
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: wandb-secret
+#                       key: api_key
+#                 - name: HF_TOKEN
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: hf-secret
+#                       key: token
+#               resources:
+#                 limits:
+#                   nvidia.com/gpu: 8
+#     Worker:
+#       replicas: 1
+#       restartPolicy: OnFailure
+#       template:
+#         spec:
+#           volumes: 
+#             - name: external-storage
+#               persistentVolumeClaim:
+#                 claimName: external-storage-persistent-volumeclaim
+#             - name: dshm
+#               emptyDir: {}
+#               medium: Memory
+#               sizeLimit: "3200Gi"
+#           containers:
+#             - name: pytorch
+#               image: nvcr.io/nvidia/pytorch:24.07-py3
+#               imagePullPolicy: IfNotPresent
+#               command: ["sleep", "36000"]
+#               volumeMounts: 
+#                 - name: external-storage # Must match the volume name above
+#                   mountPath: "/mnt/data" # Path inside the container
+#                 - name: dshm
+#                   mountPath: /dev/shm
+#               env:
+#                 - name: WANDB_API_KEY
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: wandb-secret
+#                       key: api_key
+#                 - name: HF_TOKEN
+#                   valueFrom:
+#                     secretKeyRef:
+#                       name: hf-secret
+#                       key: token
+#               resources:
+#                 limits:
+#                   nvidia.com/gpu: 8

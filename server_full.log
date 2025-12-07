@@ -1,0 +1,1000 @@
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-81.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3615 (local_rank: 7)
+  exitcode  : 1 (pid: 1673)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-81.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3612 (local_rank: 4)
+  exitcode  : 1 (pid: 1670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.577000 124727751058560 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 5 (pid: 1660) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-297.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1767 (local_rank: 7)
+  exitcode  : 1 (pid: 1662)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-297.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1765 (local_rank: 5)
+  exitcode  : 1 (pid: 1660)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.583000 139853186860160 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 0 (pid: 1662) of binary: /usr/bin/python
+W1206 21:41:00.584000 139853186860160 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-2.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+E1206 21:41:00.585000 130736825930880 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1670) of binary: /usr/bin/python
+W1206 21:41:00.586000 139853186860160 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-2.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.586000 139853186860160 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-2.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:40:59
+  host      : mpi-nemo-benchmark-s5mrj-client-2.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 896 (local_rank: 0)
+  exitcode  : 1 (pid: 1662)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+E1206 21:41:00.588000 125583124313216 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1661) of binary: /usr/bin/python
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-295.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1746 (local_rank: 2)
+  exitcode  : 1 (pid: 1670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.589000 128093852505216 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 5 (pid: 1657) of binary: /usr/bin/python
+E1206 21:41:00.589000 126561164371072 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 1 (pid: 1663) of binary: /usr/bin/python
+W1206 21:41:00.590000 126561164371072 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-352.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+Received disconnect from 10.45.239.77 port 57986:11: disconnected by user
+Disconnected from user root 10.45.239.77 port 57986
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:40:59
+  host      : mpi-nemo-benchmark-s5mrj-client-12.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 194 (local_rank: 2)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+W1206 21:41:00.592000 126561164371072 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-352.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-309.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1878 (local_rank: 6)
+  exitcode  : 1 (pid: 1658)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-309.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1877 (local_rank: 5)
+  exitcode  : 1 (pid: 1657)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.592000 129614380340352 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1656) of binary: /usr/bin/python
+W1206 21:41:00.592000 126561164371072 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-352.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+E1206 21:41:00.592000 140107210818688 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 3 (pid: 1659) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-352.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2257 (local_rank: 1)
+  exitcode  : 1 (pid: 1663)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.594000 140107210818688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-40.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1574_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+E1206 21:41:00.594000 134894014952576 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 6 (pid: 1661) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+W1206 21:41:00.595000 140107210818688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-40.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1574_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+W1206 21:41:00.595000 134894014952576 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-273.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1572_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-237.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1234 (local_rank: 2)
+  exitcode  : 1 (pid: 1656)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.596000 140107210818688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-40.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1574_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+E1206 21:41:00.596000 127974019638400 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1670) of binary: /usr/bin/python
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-40.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2683 (local_rank: 3)
+  exitcode  : 1 (pid: 1659)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.597000 134894014952576 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-273.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1572_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.597000 127974019638400 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-22.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.597000 134894014952576 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-273.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1572_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-273.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1558 (local_rank: 6)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.598000 127974019638400 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-22.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.599000 127974019638400 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-22.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-22.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1086 (local_rank: 6)
+  exitcode  : 1 (pid: 1674)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-22.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1082 (local_rank: 2)
+  exitcode  : 1 (pid: 1670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.602000 135660565136512 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 1 (pid: 1642) of binary: /usr/bin/python
+W1206 21:41:00.604000 135660565136512 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-166.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1559_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.605000 135660565136512 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-166.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1559_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.606000 135660565136512 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-166.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1559_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+E1206 21:41:00.605000 137469507626112 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 0 (pid: 1649) of binary: /usr/bin/python
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-166.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 601 (local_rank: 1)
+  exitcode  : 1 (pid: 1642)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.606000 123455875327104 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 0 (pid: 1648) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-134.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 320 (local_rank: 0)
+  exitcode  : 1 (pid: 1649)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+E1206 21:41:00.610000 133101995586688 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1670) of binary: /usr/bin/python
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-440.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3046 (local_rank: 6)
+  exitcode  : 1 (pid: 1654)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-440.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3040 (local_rank: 0)
+  exitcode  : 1 (pid: 1648)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.612000 133101995586688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-73.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+E1206 21:41:00.612000 133789523870848 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 0 (pid: 1661) of binary: /usr/bin/python
+W1206 21:41:00.613000 133101995586688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-73.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.613000 133789523870848 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-37.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.614000 133101995586688 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-73.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-73.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3538 (local_rank: 2)
+  exitcode  : 1 (pid: 1670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+W1206 21:41:00.614000 133789523870848 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-37.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.615000 133789523870848 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-37.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1579_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-37.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2408 (local_rank: 0)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.620000 123719520883840 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 3 (pid: 1658) of binary: /usr/bin/python
+W1206 21:41:00.621000 123719520883840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-207.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1573_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.623000 123719520883840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-207.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1573_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.623000 123719520883840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-207.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1573_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-207.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 975 (local_rank: 7)
+  exitcode  : 1 (pid: 1662)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-207.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 971 (local_rank: 3)
+  exitcode  : 1 (pid: 1658)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.643000 138207634662528 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 1 (pid: 1669) of binary: /usr/bin/python
+W1206 21:41:00.644000 138207634662528 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-48.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1586_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.645000 138207634662528 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-48.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1586_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.646000 138207634662528 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-48.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1586_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-48.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3319 (local_rank: 7)
+  exitcode  : 1 (pid: 1675)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-48.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3313 (local_rank: 1)
+  exitcode  : 1 (pid: 1669)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.644000 128013703545984 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1644) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-165.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 594 (local_rank: 2)
+  exitcode  : 1 (pid: 1644)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.655000 124650460406912 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 3 (pid: 1661) of binary: /usr/bin/python
+W1206 21:41:00.657000 124650460406912 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-42.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.658000 124650460406912 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-42.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.659000 124650460406912 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-42.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-42.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2859 (local_rank: 3)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.678000 127199735178368 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 4 (pid: 1661) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-19.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 812 (local_rank: 4)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.681000 135996954223744 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1661) of binary: /usr/bin/python
+W1206 21:41:00.683000 135996954223744 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-59.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.684000 135996954223744 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-59.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.685000 135996954223744 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-59.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1576_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-59.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3410 (local_rank: 2)
+  exitcode  : 1 (pid: 1661)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.697000 132273581126784 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 4 (pid: 1663) of binary: /usr/bin/python
+W1206 21:41:00.699000 132273581126784 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-186.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.700000 132273581126784 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-186.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.701000 132273581126784 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-186.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+E1206 21:41:00.700000 124012047524992 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 4 (pid: 1671) of binary: /usr/bin/python
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-186.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 780 (local_rank: 4)
+  exitcode  : 1 (pid: 1663)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-214.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 1036 (local_rank: 4)
+  exitcode  : 1 (pid: 1671)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.708000 131439184700544 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 7 (pid: 1674) of binary: /usr/bin/python
+W1206 21:41:00.710000 131439184700544 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-56.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.711000 131439184700544 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-56.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.712000 131439184700544 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-56.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1585_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-56.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3391 (local_rank: 7)
+  exitcode  : 1 (pid: 1674)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.725000 134337206269056 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 4 (pid: 1663) of binary: /usr/bin/python
+W1206 21:41:00.727000 134337206269056 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-74.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.728000 134337206269056 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-74.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.729000 134337206269056 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-74.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1577_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-74.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3548 (local_rank: 4)
+  exitcode  : 1 (pid: 1663)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.757000 138578302301312 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 3 (pid: 1654) of binary: /usr/bin/python
+W1206 21:41:00.758000 138578302301312 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-343.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1568_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.760000 138578302301312 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-343.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1568_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.760000 138578302301312 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-343.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1568_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-343.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2179 (local_rank: 3)
+  exitcode  : 1 (pid: 1654)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.766000 129274415318144 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 2 (pid: 1669) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-77.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3571 (local_rank: 3)
+  exitcode  : 1 (pid: 1670)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-77.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3570 (local_rank: 2)
+  exitcode  : 1 (pid: 1669)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.936000 135671683187840 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 7 (pid: 1648) of binary: /usr/bin/python
+W1206 21:41:00.937000 135671683187840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-454.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1558_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.939000 135671683187840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-454.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1558_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+W1206 21:41:00.939000 135671683187840 torch/distributed/elastic/rendezvous/dynamic_rendezvous.py:1217] The node 'mpi-nemo-benchmark-s5mrj-client-454.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local_1558_0' has failed to shutdown the rendezvous 'nemo_bench' due to an error of type RendezvousConnectionError.
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-454.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 3167 (local_rank: 7)
+  exitcode  : 1 (pid: 1648)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+E1206 21:41:00.967000 124627750339712 torch/distributed/elastic/multiprocessing/api.py:832] failed (exitcode: 1) local_rank: 3 (pid: 1645) of binary: /usr/bin/python
+Traceback (most recent call last):
+  File "/usr/local/bin/torchrun", line 33, in <module>
+    sys.exit(load_entry_point('torch==2.4.0a0+3bcc3cddb5.nv24.7', 'console_scripts', 'torchrun')())
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 347, in wrapper
+    return f(*args, **kwargs)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 900, in main
+    run(args)
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/run.py", line 891, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/usr/local/lib/python3.10/dist-packages/torch/distributed/launcher/api.py", line 263, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/opt/NeMo/examples/nlp/language_modeling/megatron_gpt_pretraining.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2025-12-06_21:41:00
+  host      : mpi-nemo-benchmark-s5mrj-client-364.mpi-nemo-benchmark-s5mrj.gcr-admin-test1.svc.cluster.local
+  rank      : 2363 (local_rank: 3)
+  exitcode  : 1 (pid: 1645)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+>>> Benchmark Failed.
++ cleanup_and_signal
++ echo '>>> Job finished (or failed). Signaling clients to terminate...'
+>>> Job finished (or failed). Signaling clients to terminate...
++ touch /data/nemo-signals/mpi-nemo-benchmark-s5mrj-server-0.mpi-nemo-benchmark-s5mrj.done
++ echo 'Signal written to: /data/nemo-signals/mpi-nemo-benchmark-s5mrj-server-0.mpi-nemo-benchmark-s5mrj.done'
+Signal written to: /data/nemo-signals/mpi-nemo-benchmark-s5mrj-server-0.mpi-nemo-benchmark-s5mrj.done

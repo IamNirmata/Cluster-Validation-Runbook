@@ -1,0 +1,92 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  generateName: mpi-allpair-allreduce-hari-
+  namespace: gcr-admin-test1
+spec:
+  queue: default
+  minAvailable: 1
+  plugins:
+    ssh: []
+    svc: []
+    env: []
+  tasks:
+    - name: server
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: hari-gcr-cluster-validation
+            role: server
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-vast-gcr-admin-test1
+            - name: sys
+              hostPath:
+                path: /sys
+                type: Directory
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: hari-gcr-cluster-validation
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: server
+              image: nvcr.io/nvidia/pytorch:25.10-py3
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: ALLPAIR_DEBUG
+                  value: "1"
+                # - name: LOGDIR
+                #   value: "/data/allpair-logs/20251202_051923"
+                - name: START_ROUND
+                  value: "93"
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+
+                - name: data
+                  mountPath: /data
+                - name: sys
+                  mountPath: /sys
+                  readOnly: true
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -xeo pipefail       
+                  sleep infinity
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+  

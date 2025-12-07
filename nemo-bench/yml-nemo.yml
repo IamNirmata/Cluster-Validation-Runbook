@@ -1,0 +1,200 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  generateName: mpi-nemo-benchmark-fix-2-
+  namespace: gcr-admin-test1
+spec:
+  queue: default
+  minAvailable: 478
+  plugins:
+    ssh: []
+    svc: []
+    env: []
+    mpi : ["--master=server", "--worker=client"]
+  tasks:
+    - name: server
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: hari-gcr-cluster-validation
+            role: server
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-vast-gcr-admin-test1
+            - name: sys
+              hostPath:
+                path: /sys
+                type: Directory
+            - name: scripts-vol
+              configMap:
+                name: nemo-bench-scripts
+                defaultMode: 0777
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: hari-gcr-cluster-validation
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: server
+              image: nvcr.io/nvidia/nemo:24.09 
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: ALLPAIR_DEBUG
+                  value: "1"
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: data
+                  mountPath: /data
+                - name: sys
+                  mountPath: /sys
+                  readOnly: true
+                - name: scripts-vol
+                  mountPath: /opt/Cluster-Validation-Runbook/nemo-bench
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -xeo pipefail
+                  
+                  # 1. Clone Repo (SKIPPED - using ConfigMap)
+                  # git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  
+                  # 2. Source common setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/env-nemo.sh
+
+                  # 3. Source Server setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/server-nemo.sh
+                  
+                  # 4. Logging Setup
+                  exec > >(tee -a "${LOG_DIR}/console_output.log") 2>&1
+                  
+                  # 5. Wait for workers (UPDATED PATH)
+                  bash /opt/Cluster-Validation-Runbook/nemo-bench/wait-for-ssh-nemo.sh
+                  
+                  # 6. Run NeMo Benchmark (UPDATED PATH)
+                  echo "Starting NeMo Benchmark..."
+                  cd /opt/Cluster-Validation-Runbook/nemo-bench
+                  # chmod +x *.sh
+                  bash nemo-benchmark.sh
+                  
+                  # Trap in server-nemo.sh handles the signal file on exit
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+    - name: client
+      replicas: 477
+      template:
+        metadata:
+          labels:
+            app: hari-gcr-cluster-validation
+            role: client
+        spec:
+          schedulerName: volcano
+          restartPolicy: Never
+          volumes:
+            - name: dshm
+              emptyDir:
+                medium: Memory
+                sizeLimit: 256Gi
+            - name: data
+              persistentVolumeClaim:
+                claimName: pvc-vast-gcr-admin-test1
+            - name: sys
+              hostPath:
+                path: /sys
+                type: Directory
+            - name: scripts-vol
+              configMap:
+                name: nemo-bench-scripts
+                defaultMode: 0777
+          tolerations:
+            - key: "rdma"
+              operator: "Exists"
+              effect: "NoSchedule"
+            - key: "nvidia.com/gpu"
+              operator: "Exists"
+              effect: "NoSchedule"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: hari-gcr-cluster-validation
+                  topologyKey: kubernetes.io/hostname
+          containers:
+            - name: client
+              image: nvcr.io/nvidia/nemo:24.09
+              env:
+                - name: gcrnode
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+              volumeMounts:
+                - name: dshm
+                  mountPath: /dev/shm
+                - name: data
+                  mountPath: /data
+                - name: sys
+                  mountPath: /sys
+                  readOnly: true
+                - name: scripts-vol
+                  mountPath: /opt/Cluster-Validation-Runbook/nemo-bench
+              ports:
+                - name: rdma
+                  containerPort: 18515
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -xeo pipefail
+                  # git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook                 
+                  
+                  # 1. Environment Setup (UPDATED PATH)
+                  source /opt/Cluster-Validation-Runbook/nemo-bench/env-nemo.sh
+                  
+                  # 2. Run Client Logic (UPDATED PATH)
+                  cd /opt/Cluster-Validation-Runbook/nemo-bench
+                  # chmod +x client-nemo.sh
+                  bash client-nemo.sh
+              resources:
+                requests:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
+                limits:
+                  nvidia.com/gpu: "8"
+                  cpu: "100"
+                  memory: "1500Gi"
+                  rdma/rdma_shared_device_a: "1"
