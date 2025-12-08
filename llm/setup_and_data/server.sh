@@ -3,7 +3,15 @@ source /data/Cluster-Validation-Runbook/llm/setup_and_data/1-data.sh
 source /data/Cluster-Validation-Runbook/llm/setup_and_data/2-model.sh
 bash /data/Cluster-Validation-Runbook/llm/setup_and_data/3-copy-to-clients.sh
 
-MASTER_ADDR=$(hostname -i)
+
+export MASTER_ADDR=$(hostname -i)
+export MASTER_PORT=12345
+
+# Calculate node count (assuming VC_ variables are set on master)
+# Default to 1 if not set to prevent crashes
+
+
+
 
 
 
@@ -16,7 +24,7 @@ mpirun \
     export MASTER_ADDR="'$MASTER_ADDR'"
     export MASTER_PORT=12345
     export NNODES=$(echo ${VC_SERVER_HOSTS//,/ } ${VC_CLIENT_HOSTS//,/ } | wc -w)
-    export WORLD_SIZE= $(( NNODES * 8 ))
+    export WORLD_SIZE=$(( NNODES * 8 ))
     export MODEL_PATH="/opt/llm/models/Meta-Llama-3-8B-Instruct"
     export DATASET_PATH="/opt/llm/datasets/xlam-function-calling-60k"
     export OUTPUT_DIR="/data/llm/output/llama-3-8b-function-calling-fsdp-no4"

@@ -33,3 +33,4 @@ cat /opt/hostfile
 echo "--------------------------------"
 
 export NNODES=$(echo ${VC_SERVER_HOSTS//,/ } ${VC_CLIENT_HOSTS//,/ } | wc -w)
+export WORLD_SIZE=$((NNODES * 8))
