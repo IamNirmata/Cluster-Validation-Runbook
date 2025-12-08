@@ -48,7 +48,7 @@ echo "WORLD_SIZE: $WORLD_SIZE"
 
 
 mkdir -p /data/llm/results
-timestamp=$(date +%Y%m%d_%H%M%S)
+timestamp=$(TZ='America/Los_Angeles' date +%Y%m%d_%H%M%S)
 mkdir -p /data/llm/results/llama-3-70b-function-calling-fsdp-no4
 
 mpirun \
