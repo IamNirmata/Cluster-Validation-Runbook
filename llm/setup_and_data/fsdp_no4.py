@@ -164,7 +164,7 @@ def main():
             "fsdp_timeout": 1800,
             "use_orig_params": True,
             "fsdp_transformer_layer_cls_to_wrap": ["LlamaDecoderLayer"],
-            "activation_checkpointing": True,  # use this instead of gradient_checkpointing in args
+            "activation_checkpointing": True,
         },
 
         max_steps=1000,
@@ -175,6 +175,21 @@ def main():
 
         bf16=True,
         fp16=False,
+        ddp_find_unused_parameters=False,
+    )
+
+    trainer_kwargs = dict(
+        model=model,              # already PEFT-wrapped
+        args=training_args,
+        train_dataset=train_ds,
+        eval_dataset=eval_ds,
+    )
+    sig = inspect.signature(SFTTrainer.__init__)
+    if "max_seq_length" in sig.parameters:
+        trainer_kwargs["max_seq_length"] = 2048
+    if "dataset_text_field" in sig.parameters and "dataset_text_field" not in trainer_kwargs:
+        trainer_kwargs["dataset_text_field"] = "text"
+
     trainer = SFTTrainer(**trainer_kwargs)
 
     # Add throughput callback
@@ -184,25 +199,6 @@ def main():
         * dist.get_world_size()
     )
     trainer.add_callback(ThroughputCallback(total_batch_size, trainer_kwargs.get("max_seq_length", 2048)))
-
-    if is_main: print("Starting training...", flush=True)se activation_checkpointing above
-        ddp_find_unused_parameters=False,
-    )
-
-    trainer_kwargs = dict(
-        model=model,              # already PEFT-wrapped
-        args=training_args,
-        train_dataset=train_ds,
-        eval_dataset=eval_ds,
-        # no tokenizer kw (your TRL build doesn't accept it)
-    )
-    sig = inspect.signature(SFTTrainer.__init__)
-    if "max_seq_length" in sig.parameters:
-        trainer_kwargs["max_seq_length"] = 2048
-    if "dataset_text_field" in sig.parameters and "dataset_text_field" not in trainer_kwargs:
-        trainer_kwargs["dataset_text_field"] = "text"
-
-    trainer = SFTTrainer(**trainer_kwargs)
 
     if is_main: print("Starting training...", flush=True)
     trainer.train()
