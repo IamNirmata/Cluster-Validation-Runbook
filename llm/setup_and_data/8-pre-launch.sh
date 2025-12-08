@@ -2,7 +2,7 @@ cd /data/Cluster-Validation-Runbook/llm/setup_and_data
 # git pull origin main
 echo "Starting pre-launch setup and data scripts..."
 # echo "make sure the secrets are set by running: source ../../../secrets.sh"
-bash 0-setup.sh
+bash 1-setup.sh
 
 
 # Create 1-slot hostfile for mpirun
