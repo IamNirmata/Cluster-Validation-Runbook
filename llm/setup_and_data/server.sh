@@ -27,7 +27,7 @@ NP=$(wc -l < "$HOSTFILE")
 mpirun \
     --allow-run-as-root \
     --hostfile /opt/hostfile.mpi \
-    -np " 
+    -np " '
     --bind-to none \
     bash -c '
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
