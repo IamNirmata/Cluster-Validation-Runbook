@@ -3,6 +3,28 @@ set -euo pipefail
 
 source /data/Cluster-Validation-Runbook/llm/setup_and_data/2-data.sh
 source /data/Cluster-Validation-Runbook/llm/setup_and_data/3-model.sh
+
+echo "Waiting for all workers to be ready..."
+HOSTFILE=/opt/hostfile.mpi
+# Wait for hostfile to be populated (it should be by volcano/mpi plugin, but just in case)
+while [ ! -f "$HOSTFILE" ]; do
+  echo "Waiting for $HOSTFILE..."
+  sleep 5
+done
+
+# Wait for all hosts to be resolvable
+while read -r host slots; do
+  # Skip empty lines
+  [ -z "$host" ] && continue
+  echo "Checking $host..."
+  while ! getent hosts "$host" >/dev/null; do
+    echo "Waiting for $host to resolve..."
+    sleep 5
+  done
+  echo "$host resolved."
+done < "$HOSTFILE"
+echo "All workers ready."
+
 bash   /data/Cluster-Validation-Runbook/llm/setup_and_data/4-copy-to-clients.sh
 
 export MASTER_ADDR="$(hostname -i)"
