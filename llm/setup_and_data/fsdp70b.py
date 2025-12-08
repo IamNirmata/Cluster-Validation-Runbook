@@ -105,6 +105,7 @@ def main():
                              remove_columns=eval_raw.column_names,  desc="Formatting eval").filter(lambda r: len(r["text"])>0)
 
     # --- Training Config ---
+    max_seq_length = 2048
     training_args = SFTConfig(
         output_dir=OUTPUT_DIR,
         dataset_text_field="text",
@@ -133,7 +134,6 @@ def main():
         learning_rate=1e-4,
         bf16=True,
         ddp_find_unused_parameters=False,
-        max_seq_length=2048,
     )
 
     # --- Model Loading ---
