@@ -15,8 +15,8 @@ mpirun \
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
     export MASTER_ADDR="'$MASTER_ADDR'"
     export MASTER_PORT=12345
-    export WORLD_SIZE=3824
     export NNODES=$(echo ${VC_SERVER_HOSTS//,/ } ${VC_CLIENT_HOSTS//,/ } | wc -w)
+    export WORLD_SIZE= $(( NNODES * 8 ))
     export MODEL_PATH="/opt/llm/models/Meta-Llama-3-8B-Instruct"
     export DATASET_PATH="/opt/llm/datasets/xlam-function-calling-60k"
     export OUTPUT_DIR="/data/llm/output/llama-3-8b-function-calling-fsdp-no4"
