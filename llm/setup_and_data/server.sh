@@ -49,7 +49,7 @@ mpirun \
         --nproc_per_node=8 \
         --nnodes=$NNODES \
         --node_rank=$NODE_RANK \
-        --master_addr= $MASTER_ADDR \
+        --master_addr=$MASTER_ADDR \
         --master_port=$MASTER_PORT \
         /data/Cluster-Validation-Runbook/llm/setup_and_data/fsdp_no4.py"
 
