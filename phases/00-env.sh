@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-##-------------------------- SETUP ENVIRONMENT --------------------------
 set -eo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
@@ -10,82 +8,76 @@ apt-get update -y
 apt-get install -y --no-install-recommends sudo openssh-server openssh-client ca-certificates \
 ibverbs-utils rdmacm-utils perftest infiniband-diags iputils-ping
 
-# 2. Ensure Volcano Variables are Loaded
+# 2. Load Volcano Environment
 if [ -z "$VC_SERVER_HOSTS" ]; then
   if [ -f /etc/volcano/env ]; then . /etc/volcano/env; fi
 fi
 
-# 3. SSH Configuration (Shared Keys Strategy)
-# We assume /data is the shared PVC mount point
+# 3. Setup SSH Paths (Bypassing Read-Only /root)
 SHARED_SSH_DIR="/data/ssh"
-mkdir -p /root/.ssh
+mkdir -p "$SHARED_SSH_DIR"
 
-# Determine role: The first host in VC_SERVER_HOSTS is the "Master" responsible for key gen
+# 4. Generate or Wait for Keys (Master/Worker Logic)
 MASTER_HOST=$(echo $VC_SERVER_HOSTS | cut -d',' -f1)
 
-# Check if we are the master (Match hostname prefix to handle FQDN differences)
 if [[ "$MASTER_HOST" == "$HOSTNAME"* ]]; then
-    echo ">>> [Role: MASTER] Checking shared SSH keys..."
-    
+    echo ">>> [Role: MASTER] Managing SSH keys..."
     if [ ! -f "$SHARED_SSH_DIR/id_rsa" ]; then
-        echo "    Generating new SSH key pair in $SHARED_SSH_DIR..."
-        mkdir -p "$SHARED_SSH_DIR"
+        echo "    Generating new SSH key pair..."
+        # Generate to shared storage directly
         ssh-keygen -t rsa -b 4096 -f "$SHARED_SSH_DIR/id_rsa" -N ""
+        
+        # Create authorized_keys in shared storage
+        cp "$SHARED_SSH_DIR/id_rsa.pub" "$SHARED_SSH_DIR/authorized_keys"
+        
+        # Fix permissions (crucial for SSH)
         chmod 600 "$SHARED_SSH_DIR/id_rsa"
-    else
-        echo "    SSH keys already exist in shared storage."
+        chmod 600 "$SHARED_SSH_DIR/authorized_keys"
+        chmod 700 "$SHARED_SSH_DIR"
     fi
 else
     echo ">>> [Role: WORKER] Waiting for SSH keys..."
-    # Loop until the master creates the key
     while [ ! -f "$SHARED_SSH_DIR/id_rsa" ]; do
-        echo "    Waiting for master to generate keys in $SHARED_SSH_DIR..."
+        echo "    Waiting for master to generate keys..."
         sleep 5
     done
-    echo "    Keys found!"
 fi
 
-# 4. Install Keys Locally (On ALL Nodes)
-echo ">>> Installing SSH keys to /root/.ssh..."
-cp "$SHARED_SSH_DIR/id_rsa" /root/.ssh/id_rsa
-cp "$SHARED_SSH_DIR/id_rsa.pub" /root/.ssh/id_rsa.pub
-cp "$SHARED_SSH_DIR/id_rsa.pub" /root/.ssh/authorized_keys
+# 5. Configure SSH Server (sshd) to read keys from /data
+# We modify the global config since we can't touch /root/.ssh
+echo ">>> Configuring SSH Server..."
+sed -i 's|^#*AuthorizedKeysFile.*|AuthorizedKeysFile /data/ssh/authorized_keys|g' /etc/ssh/sshd_config
+# Disable strict mode checks because /data permissions might be too open on PVCs
+echo "StrictModes no" >> /etc/ssh/sshd_config
 
-# 5. Configure SSH Client (Disable StrictHostKeyChecking)
-echo "Host *" > /root/.ssh/config
-echo "    StrictHostKeyChecking no" >> /root/.ssh/config
-chmod 600 /root/.ssh/config
-chmod 600 /root/.ssh/id_rsa
-chmod 600 /root/.ssh/authorized_keys
+# 6. Configure SSH Client (ssh) to use keys from /data
+# We modify the global client config to avoid needing /root/.ssh/config
+echo ">>> Configuring SSH Client..."
+cat >> /etc/ssh/ssh_config <<EOF
+Host *
+    IdentityFile /data/ssh/id_rsa
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel ERROR
+EOF
 
-# 6. Start SSH Daemon
+# 7. Start SSH Daemon
 echo ">>> Starting SSH Daemon..."
 mkdir -p /run/sshd
-ssh-keygen -A # Generate host keys
+ssh-keygen -A
 /usr/sbin/sshd -D -e &
 
-# 7. Generate Hostfiles
+# 8. Generate Hostfiles
 echo ">>> Generating hostfiles..."
-# Clear files first to avoid appending if script reruns
 : > /opt/hostfile 
-
 for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 if [ -n "$VC_CLIENT_HOSTS" ]; then
     for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 fi
 
-echo "--- Hostfile (/opt/hostfile) ---"
-cat /opt/hostfile
-echo "--------------------------------"
-
-# Create a new hostfile without the slots directive (for standard MPI usage)
 sed -E 's/[[:space:]]*slots=[0-9]+//' /opt/hostfile > /opt/hostfile.mpi
-echo "--- MPI Hostfile (/opt/hostfile.mpi) ---"
-cat /opt/hostfile.mpi
-echo "--------------------------------"
 
-# Export Globals
 export NNODES=$(wc -l < /opt/hostfile)
 export WORLD_SIZE=$((NNODES * 8))
 
-echo ">>> Environment Setup Complete. World Size: $WORLD_SIZE"
+echo ">>> Environment Setup Complete. Ready."
