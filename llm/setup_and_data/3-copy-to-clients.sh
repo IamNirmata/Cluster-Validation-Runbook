@@ -1,7 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+# set -euo pipefail
 
-cd /workspace/distrbuted_training_tools/llm_finetune/setup_and_data
+cd /data/Cluster-Validation-Runbook/llm/setup_and_data
 
 
 # # Run this to copy data from NFS (/data) to Local SSD (/opt) on all nodes
