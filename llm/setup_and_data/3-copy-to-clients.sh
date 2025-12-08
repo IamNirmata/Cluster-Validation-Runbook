@@ -64,7 +64,7 @@ mpirun \
     echo "[MODEL] Copying model on $(hostname)..."
     mkdir -p /opt/llm/models
     if [ ! -d /opt/llm/models/Meta-Llama-3-8B-Instruct ]; then
-      cp -a /data/llm/models/Meta-Llama-3-8B-Instruct /opt/llm/models/
+
       cp -r /data/llm/models/Meta-Llama-3-8B-Instruct /opt/llm/models/
 
       echo "[MODEL] Finished copying on $(hostname)"
