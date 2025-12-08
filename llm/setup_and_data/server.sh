@@ -10,7 +10,12 @@ export MASTER_PORT=12345
 # Calculate node count (assuming VC_ variables are set on master)
 # Default to 1 if not set to prevent crashes
 
-
+echo "Using Hostfile:"
+cat /opt/hostfile
+echo "MASTER_ADDR: $MASTER_ADDR"
+echo "MASTER_PORT: $MASTER_PORT"
+echo "NNODES: $NNODES"
+echo "WORLD_SIZE: $WORLD_SIZE"
 
 
 
