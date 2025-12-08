@@ -27,22 +27,30 @@ MASTER_HOST=$(echo $VC_SERVER_HOSTS | cut -d',' -f1)
 
 if [[ "$MASTER_HOST" == "$HOSTNAME"* ]]; then
     echo ">>> [Role: MASTER] Managing SSH keys..."
+    
+    # A. Generate Keypair if it doesn't exist
     if [ ! -f "$SHARED_SSH_DIR/id_rsa" ]; then
         echo "    Generating new SSH key pair..."
         ssh-keygen -t rsa -b 4096 -f "$SHARED_SSH_DIR/id_rsa" -N ""
-        cp "$SHARED_SSH_DIR/id_rsa.pub" "$SHARED_SSH_DIR/authorized_keys"
         chmod 600 "$SHARED_SSH_DIR/id_rsa"
+    fi
+
+    # B. Generate authorized_keys if it doesn't exist (Fixes your current error)
+    if [ ! -f "$SHARED_SSH_DIR/authorized_keys" ]; then
+        echo "    Generating authorized_keys from public key..."
+        cp "$SHARED_SSH_DIR/id_rsa.pub" "$SHARED_SSH_DIR/authorized_keys"
         chmod 600 "$SHARED_SSH_DIR/authorized_keys"
     fi
 else
     echo ">>> [Role: WORKER] Waiting for SSH keys..."
-    while [ ! -f "$SHARED_SSH_DIR/id_rsa" ]; do
+    # Wait for BOTH id_rsa AND authorized_keys
+    while [[ ! -f "$SHARED_SSH_DIR/id_rsa" || ! -f "$SHARED_SSH_DIR/authorized_keys" ]]; do
+        echo "    Waiting for master to generate keys..."
         sleep 5
     done
 fi
 
 # 5. Copy keys to LOCAL secure directory
-# This fixes "Permission denied" caused by PVCs having open permissions (777)
 echo ">>> Installing keys to local secure storage..."
 cp "$SHARED_SSH_DIR/id_rsa" "$LOCAL_SSH_DIR/id_rsa"
 cp "$SHARED_SSH_DIR/id_rsa.pub" "$LOCAL_SSH_DIR/id_rsa.pub"
@@ -54,18 +62,15 @@ chmod 600 "$LOCAL_SSH_DIR/id_rsa"
 chmod 600 "$LOCAL_SSH_DIR/authorized_keys"
 
 # 6. Configure SSH Server (sshd)
-# We forcefully replace StrictModes and AuthorizedKeysFile settings
 echo ">>> Configuring SSH Server..."
 sed -i 's/^#*StrictModes.*/StrictModes no/' /etc/ssh/sshd_config
 sed -i 's|^#*AuthorizedKeysFile.*|AuthorizedKeysFile /etc/ssh/cluster_keys/authorized_keys|g' /etc/ssh/sshd_config
 sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
-# Ensure /run/sshd exists
 mkdir -p /run/sshd
 
 # 7. Configure SSH Client (ssh)
-# We create a global config to force using the specific key
 echo ">>> Configuring SSH Client..."
 cat > /etc/ssh/ssh_config.d/99-cluster.conf <<EOF
 Host *
