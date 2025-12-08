@@ -17,13 +17,17 @@ echo "MASTER_PORT: $MASTER_PORT"
 echo "NNODES: $NNODES"
 echo "WORLD_SIZE: $WORLD_SIZE"
 
+HOSTFILE=/opt/hostfile.mpi
+cat "$HOSTFILE"
 
+# Number of nodes = number of lines in hostfile
+NP=$(wc -l < "$HOSTFILE")
 
 
 mpirun \
     --allow-run-as-root \
     --hostfile /opt/hostfile.mpi \
-    
+
     --bind-to none \
     bash -c '
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
