@@ -14,31 +14,24 @@ if [ -z "$VC_SERVER_HOSTS" ]; then
 fi
 
 # 3. Setup Paths
-# SHARED: Used to transfer keys between Master and Workers (on PVC)
 SHARED_SSH_DIR="/data/ssh"
-# LOCAL: Used by SSHD/SSH client for actual auth (Avoids PVC permission issues & Read-only root)
 LOCAL_SSH_DIR="/etc/ssh/cluster_keys"
 
 mkdir -p "$SHARED_SSH_DIR"
 mkdir -p "$LOCAL_SSH_DIR"
 
-# 4. Generate or Wait for Keys (Master/Worker Logic)
+# 4. Generate or Wait for Keys
 MASTER_HOST=$(echo $VC_SERVER_HOSTS | cut -d',' -f1)
 
 if [[ "$MASTER_HOST" == "$HOSTNAME"* ]]; then
     echo ">>> [Role: MASTER] Managing SSH keys..."
-    
-    # A. Generate Keypair if it doesn't exist
     if [ ! -f "$SHARED_SSH_DIR/id_rsa" ]; then
         echo "    Generating new SSH key pair..."
         ssh-keygen -t rsa -b 4096 -f "$SHARED_SSH_DIR/id_rsa" -N ""
         chmod 600 "$SHARED_SSH_DIR/id_rsa"
     fi
-
-    # B. Generate authorized_keys if it doesn't exist (FIX for your error)
     if [ ! -f "$SHARED_SSH_DIR/authorized_keys" ]; then
-        echo "    Generating authorized_keys from public key..."
-        # Ensure public key exists first
+        echo "    Generating authorized_keys..."
         if [ ! -f "$SHARED_SSH_DIR/id_rsa.pub" ]; then
              ssh-keygen -y -f "$SHARED_SSH_DIR/id_rsa" > "$SHARED_SSH_DIR/id_rsa.pub"
         fi
@@ -47,27 +40,22 @@ if [[ "$MASTER_HOST" == "$HOSTNAME"* ]]; then
     fi
 else
     echo ">>> [Role: WORKER] Waiting for SSH keys..."
-    # Wait for BOTH id_rsa AND authorized_keys
     while [[ ! -f "$SHARED_SSH_DIR/id_rsa" || ! -f "$SHARED_SSH_DIR/authorized_keys" ]]; do
-        echo "    Waiting for master to generate keys..."
         sleep 5
     done
 fi
 
-# 5. Copy keys to LOCAL secure directory
-# This fixes "Permission denied" caused by PVCs having open permissions (777)
+# 5. Install Keys Locally
 echo ">>> Installing keys to local secure storage..."
 cp "$SHARED_SSH_DIR/id_rsa" "$LOCAL_SSH_DIR/id_rsa"
 cp "$SHARED_SSH_DIR/id_rsa.pub" "$LOCAL_SSH_DIR/id_rsa.pub"
 cp "$SHARED_SSH_DIR/authorized_keys" "$LOCAL_SSH_DIR/authorized_keys"
 
-# Fix permissions locally
 chmod 700 "$LOCAL_SSH_DIR"
 chmod 600 "$LOCAL_SSH_DIR/id_rsa"
 chmod 600 "$LOCAL_SSH_DIR/authorized_keys"
 
-# 6. Configure SSH Server (sshd)
-# We forcefully replace StrictModes and AuthorizedKeysFile settings
+# 6. Configure SSH Server
 echo ">>> Configuring SSH Server..."
 sed -i 's/^#*StrictModes.*/StrictModes no/' /etc/ssh/sshd_config
 sed -i 's|^#*AuthorizedKeysFile.*|AuthorizedKeysFile /etc/ssh/cluster_keys/authorized_keys|g' /etc/ssh/sshd_config
@@ -76,8 +64,7 @@ sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_con
 
 mkdir -p /run/sshd
 
-# 7. Configure SSH Client (ssh)
-# We create a global config to force using the specific key
+# 7. Configure SSH Client
 echo ">>> Configuring SSH Client..."
 cat > /etc/ssh/ssh_config.d/99-cluster.conf <<EOF
 Host *
@@ -92,15 +79,22 @@ echo ">>> Starting SSH Daemon..."
 ssh-keygen -A
 /usr/sbin/sshd -D -e &
 
-# 9. Generate Hostfiles
+# 9. Generate Hostfiles (CRITICAL FIX HERE)
 echo ">>> Generating hostfiles..."
 : > /opt/hostfile 
+# Generate the standard hostfile (8 GPUs per node)
 for host in ${VC_SERVER_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 if [ -n "$VC_CLIENT_HOSTS" ]; then
     for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostfile
 fi
 
-sed -E 's/[[:space:]]*slots=[0-9]+//' /opt/hostfile > /opt/hostfile.mpi
+# Generate the MPI hostfile with slots=1
+# This ensures mpirun launches exactly ONE torchrun controller per node
+sed 's/slots=[0-9]*/slots=1/g' /opt/hostfile > /opt/hostfile.mpi
+
+echo "--- MPI Hostfile (slots=1) ---"
+cat /opt/hostfile.mpi
+echo "------------------------------"
 
 export NNODES=$(wc -l < /opt/hostfile)
 export WORLD_SIZE=$((NNODES * 8))
