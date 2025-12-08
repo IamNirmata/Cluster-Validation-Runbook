@@ -1,19 +1,19 @@
 
 
-import os, json, inspect
+import os, json, inspect, time
 from typing import Tuple
 
 import torch
 import torch.distributed as dist
 from datasets import Dataset, DatasetDict, load_from_disk
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainerCallback
 from peft import LoraConfig, get_peft_model
 from trl import SFTConfig, SFTTrainer
 
 # -------------------- Env --------------------
-MODEL_PATH   = os.environ.get("MODEL_PATH",   "/mnt/data/models/Meta-Llama-3-8B-Instruct")
+MODEL_PATH   = os.environ.get("MODEL_PATH",   "/mnt/data/models/Llama-3.3-70B-Instruct")
 DATASET_PATH = os.environ.get("DATASET_PATH", "/mnt/data/datasets/xlam-function-calling-60k")
-OUTPUT_DIR   = os.environ.get("OUTPUT_DIR",   "/mnt/data/output/llama-3-8b-function-calling-fsdp-no4")
+OUTPUT_DIR   = os.environ.get("OUTPUT_DIR",   "/mnt/data/output/llama-3-70b-function-calling-fsdp-no4")
 
 os.environ.setdefault("WANDB_PROJECT", "func_calls_llm")
 os.environ.setdefault("WANDB_ENTITY",  "iamnirmata-microsoft")
@@ -62,6 +62,25 @@ def _load_splits(path: str) -> Tuple[Dataset, Dataset]:
         split = data.train_test_split(test_size=0.1, seed=42)
         train_split, eval_split = split["train"], split["test"]
     return train_split, eval_split
+
+class ThroughputCallback(TrainerCallback):
+    def __init__(self, total_batch_size, seq_len):
+        self.total_batch_size = total_batch_size
+        self.seq_len = seq_len
+        self.last_time = None
+
+    def on_step_begin(self, args, state, control, **kwargs):
+        self.last_time = time.time()
+
+    def on_step_end(self, args, state, control, **kwargs):
+        if self.last_time is None:
+            return
+        current_time = time.time()
+        elapsed = current_time - self.last_time
+        if elapsed > 0:
+            tokens = self.total_batch_size * self.seq_len
+            tps = tokens / elapsed
+            print(f"Step {state.global_step}: {tps:.2f} tokens/sec (approx)")
 
 def main():
     global_rank, local_rank, is_main = _setup_ddp()
@@ -150,15 +169,23 @@ def main():
 
         max_steps=1000,
         warmup_ratio=0.1,
-        logging_steps=10,
+        logging_steps=1,
         save_steps=250,
         learning_rate=1e-4,
 
         bf16=True,
         fp16=False,
+    trainer = SFTTrainer(**trainer_kwargs)
 
-        save_on_each_node=False,
-        gradient_checkpointing=False,  # keep False; we use activation_checkpointing above
+    # Add throughput callback
+    total_batch_size = (
+        training_args.per_device_train_batch_size
+        * training_args.gradient_accumulation_steps
+        * dist.get_world_size()
+    )
+    trainer.add_callback(ThroughputCallback(total_batch_size, trainer_kwargs.get("max_seq_length", 2048)))
+
+    if is_main: print("Starting training...", flush=True)se activation_checkpointing above
         ddp_find_unused_parameters=False,
     )
 

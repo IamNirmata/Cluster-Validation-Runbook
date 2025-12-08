@@ -60,9 +60,9 @@ mpirun \
   bash -lc '
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
 
-    export MODEL_PATH=/opt/llm/models/Meta-Llama-3-8B-Instruct
+    export MODEL_PATH=/opt/llm/models/Llama-3.3-70B-Instruct
     export DATASET_PATH=/opt/llm/datasets/xlam-function-calling-60k
-    export OUTPUT_DIR=/data/llm/output/llama-3-8b-function-calling-fsdp-no4
+    export OUTPUT_DIR=/data/llm/output/llama-3-70b-function-calling-fsdp-no4
 
     export WANDB_API_KEY=${WANDB_API_KEY:-}
     export WANDB_PROJECT=${WANDB_PROJECT:-func_calls_llm}

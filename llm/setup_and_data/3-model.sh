@@ -5,11 +5,11 @@ echo "Downloading model files to ${nfsdir}/models ..."
 
 export HF_HUB_ENABLE_HF_TRANSFER=1
 
-MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-# TARGET="/models/Meta-Llama-3-8B-Instruct"
+MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
+# TARGET="/models/Llama-3.3-70B-Instruct"
 echo "Model ID: $MODEL_ID"
 echo "NFS Dir: $nfsdir"
-TARGET="$nfsdir/models/Meta-Llama-3-8B-Instruct"
+TARGET="$nfsdir/models/Llama-3.3-70B-Instruct"
 
 mkdir -p "$TARGET"
 
@@ -30,5 +30,5 @@ snapshot_download(
 print("Download complete -> $TARGET")
 PY
 
-ls -lh ${nfsdir}/models/Meta-Llama-3-8B-Instruct
+ls -lh ${nfsdir}/models/Llama-3.3-70B-Instruct
 echo "Model download script completed."
