@@ -47,7 +47,7 @@ echo "NNODES: $NNODES"
 echo "WORLD_SIZE: $WORLD_SIZE"
 
 
-
+mkd
 
 mpirun \
   --allow-run-as-root \
