@@ -23,7 +23,7 @@ def _setup_ddp() -> Tuple[int, int, bool]:
     
     # Initialize process group if not already initialized (Trainer might do it, but safe to check)
     if not dist.is_initialized():
-        dist.init_process_group(backend="nccl", timeout=torch.timedelta(seconds=7200))
+        dist.init_process_group(backend="nccl", timeout=datetime.timedelta(seconds=7200))
     
     local_rank  = int(os.environ.get("LOCAL_RANK", 0))
     global_rank = int(os.environ.get("RANK", 0))
