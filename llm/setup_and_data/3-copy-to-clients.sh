@@ -64,9 +64,7 @@ mpirun \
     echo "[MODEL] Copying model on $(hostname)..."
     mkdir -p /opt/llm/models
     if [ ! -d /opt/llm/models/Meta-Llama-3-8B-Instruct ]; then
-
       cp -r /data/llm/models/Meta-Llama-3-8B-Instruct /opt/llm/models/
-
       echo "[MODEL] Finished copying on $(hostname)"
     else
       echo "[MODEL] Model already exists on $(hostname), skipping."
