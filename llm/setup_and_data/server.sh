@@ -66,7 +66,7 @@ mpirun \
 
     export MODEL_PATH=/opt/llm/models/Llama-3.3-70B-Instruct
     export DATASET_PATH=/opt/llm/datasets/xlam-function-calling-60k
-    export OUTPUT_DIR=/data/llm/output/llama-3-70b-function-calling-fsdp-no4
+    export OUTPUT_DIR=/data/llm/output/llama-3-70b-function-calling-fsdp70b
 
     export WANDB_API_KEY=${WANDB_API_KEY:-}
     export WANDB_PROJECT=${WANDB_PROJECT:-func_calls_llm}
@@ -74,14 +74,14 @@ mpirun \
     export WANDB_MODE=disabled
     export PYTHONUNBUFFERED=1
 
-    echo "Node $(hostname): Starting FSDP No.4 (Rank $NODE_RANK)..."
+    echo "Node $(hostname): Starting FSDP 70B (Rank $NODE_RANK)..."
     echo " torchrun command: torchrun \
       --nproc_per_node=8 \
       --nnodes=$NNODES \
       --node_rank=$NODE_RANK \
       --master_addr=$MASTER_ADDR \
       --master_port=$MASTER_PORT \
-      /data/Cluster-Validation-Runbook/llm/setup_and_data/fsdp_no4.py"
+      /data/Cluster-Validation-Runbook/llm/setup_and_data/fsdp70b.py"
 
     torchrun \
       --nproc_per_node=8 \
