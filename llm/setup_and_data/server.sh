@@ -12,7 +12,7 @@ echo "Using Hostfile:####################################"
 cat /opt/hostfile
 
 HOSTFILE=/opt/hostfile.mpi
-
+echo "Using Hostfile for mpirun:#########################"
 cat "$HOSTFILE"
 
 NP=$(wc -l < "$HOSTFILE")
