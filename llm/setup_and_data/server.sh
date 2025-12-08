@@ -23,6 +23,7 @@ echo "WORLD_SIZE: $WORLD_SIZE"
 mpirun \
     --allow-run-as-root \
     --hostfile /opt/hostfile.mpi \
+    
     --bind-to none \
     bash -c '
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
