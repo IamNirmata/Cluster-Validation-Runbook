@@ -3,8 +3,7 @@ cd /data/Cluster-Validation-Runbook/llm/setup_and_data
 echo "Starting pre-launch setup and data scripts..."
 # echo "make sure the secrets are set by running: source ../../../secrets.sh"
 bash 0-setup.sh
-# bash 1-data.sh
-# bash 2-model.sh
+
 
 # Create 1-slot hostfile for mpirun
 sed 's/slots=[0-9]*/slots=1/g' /opt/hostfile > /opt/hostfile_setup
