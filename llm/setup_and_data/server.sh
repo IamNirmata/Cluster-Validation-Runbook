@@ -49,7 +49,7 @@ echo "WORLD_SIZE: $WORLD_SIZE"
 
 mkdir -p /data/llm/results
 timestamp=$(date +%Y%m%d_%H%M%S)
-mkdir -p /data/llm/results/lla
+mkdir -p /data/llm/results/
 
 mpirun \
   --allow-run-as-root \
