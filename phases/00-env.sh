@@ -31,3 +31,5 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostf
 echo "--- Hostfile (/opt/hostfile) ---"
 cat /opt/hostfile
 echo "--------------------------------"
+
+export NNODES=$(echo ${VC_SERVER_HOSTS//,/ } ${VC_CLIENT_HOSTS//,/ } | wc -w)
