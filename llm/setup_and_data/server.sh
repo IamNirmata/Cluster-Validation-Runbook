@@ -46,6 +46,9 @@ echo "MASTER_PORT: $MASTER_PORT"
 echo "NNODES: $NNODES"
 echo "WORLD_SIZE: $WORLD_SIZE"
 
+
+
+
 mpirun \
   --allow-run-as-root \
   --hostfile "$HOSTFILE" \
