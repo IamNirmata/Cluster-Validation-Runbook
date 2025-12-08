@@ -47,7 +47,8 @@ echo "NNODES: $NNODES"
 echo "WORLD_SIZE: $WORLD_SIZE"
 
 
-mkdir -p /data/llm/re
+mkdir -p /data/llm/results
+
 
 mpirun \
   --allow-run-as-root \
