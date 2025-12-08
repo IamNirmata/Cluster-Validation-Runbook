@@ -8,7 +8,7 @@ bash   /data/Cluster-Validation-Runbook/llm/setup_and_data/3-copy-to-clients.sh
 export MASTER_ADDR="$(hostname -i)"
 export MASTER_PORT=12345
 
-echo "Using Hostfile:"
+echo "Using Hostfile:####################################"
 cat /opt/hostfile
 
 HOSTFILE=/opt/hostfile.mpi
