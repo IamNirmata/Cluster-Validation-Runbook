@@ -9,7 +9,7 @@ echo "make sure the secrets are set by running: source ../../../secrets.sh"
 # Run this to copy data from NFS (/data) to Local SSD (/opt) on all nodes
 mpirun \
     --allow-run-as-root \
-    --hostfile /opt/hostfile_setup \
+    --hostfile /opt/hostfile.mpi \
     --bind-to none \
     bash -c "mkdir -p /opt/llm/datasets && \
              echo 'Copying data on \$(hostname)...' && \
@@ -18,7 +18,7 @@ mpirun \
 
 mpirun \
     --allow-run-as-root \
-    --hostfile /opt/hostfile_setup \
+    --hostfile /opt/hostfile.mpi \
     --bind-to none \
     bash -c "mkdir -p /opt/llm/models && \
              echo 'Copying model on \$(hostname)...' && \
