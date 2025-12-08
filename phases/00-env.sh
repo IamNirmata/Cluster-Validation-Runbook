@@ -31,6 +31,12 @@ for host in ${VC_CLIENT_HOSTS//,/ }; do echo "$host slots=8"; done >> /opt/hostf
 echo "--- Hostfile (/opt/hostfile) ---"
 cat /opt/hostfile
 echo "--------------------------------"
+# Create a new hostfile without the slots directive
+sed -E 's/[[:space:]]*slots=[0-9]+//' /opt/hostfile > /opt/hostfile.mpi
+echo "--- MPI Hostfile (/opt/hostfile.mpi) ---"
+cat /opt/hostfile.mpi
+echo "--------------------------------"
+
 
 export NNODES=$(echo ${VC_SERVER_HOSTS//,/ } ${VC_CLIENT_HOSTS//,/ } | wc -w)
 export WORLD_SIZE=$((NNODES * 8))
