@@ -16,7 +16,7 @@ fi
 # 3. Setup Paths
 # SHARED: Used to transfer keys between Master and Workers (on PVC)
 SHARED_SSH_DIR="/data/ssh"
-# LOCAL: Used by SSHD/SSH client for actual auth (Avoids PVC permission issues)
+# LOCAL: Used by SSHD/SSH client for actual auth (Avoids PVC permission issues & Read-only root)
 LOCAL_SSH_DIR="/etc/ssh/cluster_keys"
 
 mkdir -p "$SHARED_SSH_DIR"
@@ -35,9 +35,13 @@ if [[ "$MASTER_HOST" == "$HOSTNAME"* ]]; then
         chmod 600 "$SHARED_SSH_DIR/id_rsa"
     fi
 
-    # B. Generate authorized_keys if it doesn't exist (Fixes your current error)
+    # B. Generate authorized_keys if it doesn't exist (FIX for your error)
     if [ ! -f "$SHARED_SSH_DIR/authorized_keys" ]; then
         echo "    Generating authorized_keys from public key..."
+        # Ensure public key exists first
+        if [ ! -f "$SHARED_SSH_DIR/id_rsa.pub" ]; then
+             ssh-keygen -y -f "$SHARED_SSH_DIR/id_rsa" > "$SHARED_SSH_DIR/id_rsa.pub"
+        fi
         cp "$SHARED_SSH_DIR/id_rsa.pub" "$SHARED_SSH_DIR/authorized_keys"
         chmod 600 "$SHARED_SSH_DIR/authorized_keys"
     fi
@@ -51,6 +55,7 @@ else
 fi
 
 # 5. Copy keys to LOCAL secure directory
+# This fixes "Permission denied" caused by PVCs having open permissions (777)
 echo ">>> Installing keys to local secure storage..."
 cp "$SHARED_SSH_DIR/id_rsa" "$LOCAL_SSH_DIR/id_rsa"
 cp "$SHARED_SSH_DIR/id_rsa.pub" "$LOCAL_SSH_DIR/id_rsa.pub"
@@ -62,6 +67,7 @@ chmod 600 "$LOCAL_SSH_DIR/id_rsa"
 chmod 600 "$LOCAL_SSH_DIR/authorized_keys"
 
 # 6. Configure SSH Server (sshd)
+# We forcefully replace StrictModes and AuthorizedKeysFile settings
 echo ">>> Configuring SSH Server..."
 sed -i 's/^#*StrictModes.*/StrictModes no/' /etc/ssh/sshd_config
 sed -i 's|^#*AuthorizedKeysFile.*|AuthorizedKeysFile /etc/ssh/cluster_keys/authorized_keys|g' /etc/ssh/sshd_config
@@ -71,6 +77,7 @@ sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_con
 mkdir -p /run/sshd
 
 # 7. Configure SSH Client (ssh)
+# We create a global config to force using the specific key
 echo ">>> Configuring SSH Client..."
 cat > /etc/ssh/ssh_config.d/99-cluster.conf <<EOF
 Host *
