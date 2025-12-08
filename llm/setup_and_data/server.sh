@@ -48,6 +48,7 @@ echo "WORLD_SIZE: $WORLD_SIZE"
 
 
 mkdir -p /data/llm/results
+times
 mkdir -p /data/llm/results/llama-3-70b-function-calling-fsdp-no4
 
 mpirun \
