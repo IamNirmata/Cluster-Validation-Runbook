@@ -45,6 +45,7 @@ mpirun \
     export WANDB_API_KEY=${WANDB_API_KEY:-}
     export WANDB_PROJECT=${WANDB_PROJECT:-func_calls_llm}
     export WANDB_ENTITY=${WANDB_ENTITY:-iamnirmata-microsoft}
+    export WANDB_MODE=disabled
     export PYTHONUNBUFFERED=1
 
     echo "Node $(hostname): Starting FSDP No.4 (Rank $NODE_RANK)..."
