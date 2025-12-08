@@ -29,6 +29,12 @@ mpirun \
   --hostfile "$HOSTFILE" \
   -np "$NP" \
   --bind-to none \
+  -x NNODES \
+  -x MASTER_ADDR \
+  -x MASTER_PORT \
+  -x WANDB_API_KEY \
+  -x WANDB_PROJECT \
+  -x WANDB_ENTITY \
   bash -lc '
     export NODE_RANK=$OMPI_COMM_WORLD_RANK
 
