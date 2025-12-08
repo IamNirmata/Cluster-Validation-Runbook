@@ -4,7 +4,7 @@ cd /workspace/distrbuted_training_tools/llm_finetune/setup_and_data
 echo "Starting pre-launch setup and data scripts..."
 echo "make sure the secrets are set by running: source ../../../secrets.sh"
 
-#/opt/hostfile_setup
+cat /opt/hostfile.mpi
 
 # Run this to copy data from NFS (/data) to Local SSD (/opt) on all nodes
 mpirun \
