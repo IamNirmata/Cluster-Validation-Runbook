@@ -4,7 +4,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # 1. Install Dependencies
 echo ">>> Installing dependencies..."
-apt-get update -y || true
+for i in {1..5}; do apt-get update -y && break || sleep 15; done
 apt-get install -y --no-install-recommends sudo openssh-server openssh-client ca-certificates \
 ibverbs-utils rdmacm-utils perftest infiniband-diags iputils-ping
 
