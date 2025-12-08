@@ -44,6 +44,8 @@ mpirun \
     if [ ! -d /opt/llm/datasets/xlam-function-calling-60k ]; then
       # -a to preserve permissions/metadata; adjust if you want
       cp -a /data/llm/datasets/xlam-function-calling-60k /opt/llm/datasets/
+      cp -r /data/llm/datasets/xlam-function-calling-60k /opt/llm/datasets/
+
       echo "[DATA] Finished copying on $(hostname)"
     else
       echo "[DATA] Dataset already exists on $(hostname), skipping."
