@@ -50,7 +50,6 @@ echo "WORLD_SIZE: $WORLD_SIZE"
 mkdir -p /data/llm/results
 timestamp=$(date +%Y%m%d_%H%M%S)
 mkdir -p /data/llm/results/llama3_finetune_$timestamp
-
 mpirun \
   --allow-run-as-root \
   --hostfile "$HOSTFILE" \
@@ -91,7 +90,7 @@ mpirun \
       --master_addr=$MASTER_ADDR \
       --master_port=$MASTER_PORT \
       /data/Cluster-Validation-Runbook/llm/setup_and_data/fsdp70b.py
-  '
+  ' 2>&1 | tee /data/llm/results/llama3_finetune_$timestamp/finetune_$timestamp.log
 
 
 
