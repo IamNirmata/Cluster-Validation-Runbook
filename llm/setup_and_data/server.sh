@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-source /data/Cluster-Validation-Runbook/llm/setup_and_data/1-data.sh
-source /data/Cluster-Validation-Runbook/llm/setup_and_data/2-model.sh
-bash   /data/Cluster-Validation-Runbook/llm/setup_and_data/3-copy-to-clients.sh
+source /data/Cluster-Validation-Runbook/llm/setup_and_data/2-data.sh
+source /data/Cluster-Validation-Runbook/llm/setup_and_data/3-model.sh
+bash   /data/Cluster-Validation-Runbook/llm/setup_and_data/4-copy-to-clients.sh
 
 export MASTER_ADDR="$(hostname -i)"
 export MASTER_PORT=12345
