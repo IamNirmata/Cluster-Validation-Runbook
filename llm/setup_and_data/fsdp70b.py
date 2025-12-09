@@ -109,6 +109,7 @@ def main():
     training_args = SFTConfig(
         output_dir=OUTPUT_DIR,
         dataset_text_field="text",
+        max_length=max_seq_length,
         remove_unused_columns=False,
         report_to="wandb",  # Ensure WANDB_API_KEY is set or use "none"
 
