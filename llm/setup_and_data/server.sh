@@ -22,6 +22,13 @@ while read -r host slots; do
     sleep 5
   done
   echo "$host resolved."
+
+  echo "Checking SSH port on $host..."
+  while ! python3 -c "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(2); s.connect(('$host', 22)); s.close()" 2>/dev/null; do
+    echo "Waiting for SSH port on $host..."
+    sleep 5
+  done
+  echo "SSH port on $host is open."
 done < "$HOSTFILE"
 echo "All workers ready."
 
