@@ -162,7 +162,6 @@ def main():
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         processing_class=tokenizer,
-        max_seq_length=max_seq_length,
     )
     
     trainer.add_callback(ThroughputCallback(total_batch_size, max_seq_length))
