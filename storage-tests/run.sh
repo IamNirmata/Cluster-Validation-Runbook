@@ -42,4 +42,5 @@ fio randwrite.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$ti
 fio randread.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/randread.json
 fio iodepth_write_1file.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/iodepth_write_1file.json
 fio iodepth_read_1file.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/iodepth_read_1file.json
-fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/numjobs_write_n
+fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/numjobs_write_nfiles.json
+fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage
