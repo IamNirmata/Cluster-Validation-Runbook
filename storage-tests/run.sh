@@ -8,7 +8,9 @@ echo "Storage test directory set up at /data/storage-tests/$GCRNODE/$timestamp"
 
 
 """
+numjobs read nfiles test
 
+fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_test/output/numjobs_read_nfiles.json
 sdsd
 
 
