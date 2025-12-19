@@ -1,3 +1,3 @@
 echo "Setting up storage test directory..."
-echo "
+echo "GCRNODE: $GCRNODE"
 mkdir -p /data/storage-tests/
