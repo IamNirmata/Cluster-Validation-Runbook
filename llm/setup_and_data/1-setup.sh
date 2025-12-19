@@ -48,3 +48,4 @@ cd $codedir
 echo "Starting setup and data scripts..."
 
 chmod +x setup_and_data/*.sh
+    
