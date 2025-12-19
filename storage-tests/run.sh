@@ -35,4 +35,5 @@ fio randwrite.fio --output-format=json --output=/data/storage_test/output/randwr
 
 """
 
-#write test the
+#write test then read test
+
