@@ -38,4 +38,4 @@ fio randwrite.fio --output-format=json --output=/data/storage_test/output/randwr
 #write test then read test
 echo "Starting storage tests..."
 
-fio rand
+fio randwrite.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/randwrite.json
