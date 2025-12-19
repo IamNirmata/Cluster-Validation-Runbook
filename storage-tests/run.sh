@@ -5,7 +5,7 @@ echo "GCRNODE: $GCRNODE"
 #california timrstamp
 timestamp=$(date +%Y%m%d_%H%M%S -d 'TZ="America/Los_Angeles" now')
 echo "Timestamp: $timestamp"
-mkdir -p /data/storage_tests/$GCRNODE/$timestamp
+mkdir -p /data/storage_tests/output/$GCRNODE/$timestamp
 echo "Storage test directory set up at /data/storage_tests/output/$GCRNODE/$timestamp"
 
 
