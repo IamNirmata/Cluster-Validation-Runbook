@@ -1,1 +1,1 @@
-mkdir -p /data/storage-tests
+mkdir -p /data/storage-tests/
