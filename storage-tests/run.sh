@@ -51,4 +51,4 @@ fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage-tests/$
 echo "Running numjobs read test...6/6 tests"
 fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/numjobs_read_nfiles.json
 
-
+ech
