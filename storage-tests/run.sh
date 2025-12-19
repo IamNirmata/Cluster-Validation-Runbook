@@ -43,6 +43,7 @@ echo "Running iodepth write test...3/6 tests"
 fio iodepth_write_1file.fio --output-format=json --output=/data/storage_tests/output/$GCRNODE/$timestamp/iodepth_write_1file.json
 echo "Running iodepth read test...4/6 tests"
 fio iodepth_read_1file.fio --output-format=json --output=/data/storage_tests/output/$GCRNODE/$timestamp/iodepth_read_1file.json
+
 echo "Running numjobs write test...5/6 tests"
 fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_tests/output/$GCRNODE/$timestamp/numjobs_write_nfiles.json
 echo "Running numjobs read test...6/6 tests"
