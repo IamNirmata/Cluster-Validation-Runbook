@@ -13,6 +13,11 @@ numjobs read nfiles test
 fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_test/output/numjobs_read_nfiles.json
 
 
+Numjobs write nfiles test
+
+fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_test/output/numjobs_write_nfiles.json
+
+
 
 
 
