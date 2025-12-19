@@ -25,12 +25,10 @@ fio iodepth_write_1file.fio --output-format=json --output=/data/storage_test/out
 
 
 Random read test
-
 fio randread.fio --output-format=json --output=/data/storage_test/output/randread.json
 
 
 Random write test
-
 fio randwrite.fio --output-format=json --output=/data/storage_test/output/randwrite.json
 
 """
