@@ -9,7 +9,8 @@ mkdir -p /data/storage_tests/output/$GCRNODE/$timestamp
 echo "Storage test directory set up at /data/storage_tests/output/$GCRNODE/$timestamp"
 
 cd /data/storage_tests/
-echo p
+echo pwd: $(pwd)
+
 
 """
 numjobs read nfiles test
