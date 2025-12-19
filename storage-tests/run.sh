@@ -15,8 +15,7 @@ fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_tests/ou
 
 
 Numjobs write nfiles test
-fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_test/output/numjobs_write_nfiles.json
-
+fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_write_nfiles.json
 
 Iodepth read 1file test
 fio iodepth_read_1file.fio --output-format=json --output=/data/storage_test/output/iodepth_read_1file.json
