@@ -8,7 +8,7 @@ echo "Timestamp: $timestamp"
 mkdir -p /data/storage_tests/output/$GCRNODE/$timestamp
 echo "Storage test directory set up at /data/storage_tests/output/$GCRNODE/$timestamp"
 
-cd /data/storage_tests/fio_tests
+cd /data/storage_tests/
 
 """
 numjobs read nfiles test
