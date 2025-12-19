@@ -1,4 +1,4 @@
-sudo apt-get update && apt-get install -y fio
+apt-get update && apt-get install -y fio
 
 echo "Setting up storage test directory..."
 echo "GCRNODE: $GCRNODE"
