@@ -72,8 +72,7 @@ spec:
               command: ["/bin/bash", "-lc"]
               args:
                 - |
-                  echo "Sleeping."
-                  sleep infinity
+                  git clone 
               resources:
                 requests:
                   nvidia.com/gpu: "8"
