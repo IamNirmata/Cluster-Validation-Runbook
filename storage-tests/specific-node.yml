@@ -72,7 +72,8 @@ spec:
               command: ["/bin/bash", "-lc"]
               args:
                 - |
-                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook 
+                  git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
+                   
               resources:
                 requests:
                   nvidia.com/gpu: "8"
