@@ -1,4 +1,5 @@
 echo "Setting up storage test directory..."
 echo "GCRNODE: $GCRNODE"
-#california tim
+#california timrstamp
+
 mkdir -p /data/storage-tests/
