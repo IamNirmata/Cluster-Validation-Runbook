@@ -45,6 +45,6 @@ fio iodepth_read_1file.fio --output-format=json --output=/data/storage_tests/out
 echo "Running numjobs write test...5/6 tests"
 fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_tests/output/$GCRNODE/$timestamp/numjobs_write_nfiles.json
 echo "Running numjobs read test...6/6 tests"
-fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage-tests/$GCRNODE/$timestamp/numjobs_read_nfiles.json
+fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_tests/output/$GCRNODE/$timestamp/numjobs_read_nfiles.json
 
-echo "Storage tests completed. Results saved in /data/storage-tests/$GCRNODE/$timestamp/"
+echo "Storage tests completed. Results saved in /data/storage_tests/output/$GCRNODE/$timestamp/"
