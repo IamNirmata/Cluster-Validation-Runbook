@@ -21,8 +21,7 @@ Iodepth read 1file test
 fio iodepth_read_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_read_1file.json
 
 Iodepth write 1file test
-fio iodepth_write_1file.fio --output-format=json --output=/data/storage_test/output/iodepth_write_1file.json
-
+fio iodepth_write_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_write_1file.json
 
 Random read test
 fio randread.fio --output-format=json --output=/data/storage_test/output/randread.json
