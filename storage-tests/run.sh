@@ -1,3 +1,3 @@
 echo "Setting up storage test directory..."
-ec
+ech
 mkdir -p /data/storage-tests/
