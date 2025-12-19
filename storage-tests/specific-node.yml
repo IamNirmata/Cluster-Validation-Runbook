@@ -74,7 +74,6 @@ spec:
                 - |
                   git clone https://github.com/IamNirmata/Cluster-Validation-Runbook.git /opt/Cluster-Validation-Runbook
                   bash /opt/Cluster-Validation-Runbook/storage-tests/run.sh
-                  
               resources:
                 requests:
                   nvidia.com/gpu: "8"
