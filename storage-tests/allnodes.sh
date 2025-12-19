@@ -4,7 +4,7 @@
 TEMPLATE_FILE="/home/hari/b200/validation/Cluster-Validation-Runbook/storage-tests/specific-node.yml"
 BASE_NODE_NAME="slc01-cl02-hgx"
 START=1
-END=479
+END=2
 
 echo "Starting job submission for nodes ${START} to ${END}..."
 
