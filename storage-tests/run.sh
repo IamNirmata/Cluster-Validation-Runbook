@@ -12,6 +12,7 @@ cd /data/storage_tests/
 echo pwd: $(pwd)
 
 
+
 # numjobs read nfiles test
 # fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_read_nfiles.json
 
