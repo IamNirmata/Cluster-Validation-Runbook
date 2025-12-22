@@ -12,27 +12,25 @@ cd /data/storage_tests/
 echo pwd: $(pwd)
 
 
-"""
-numjobs read nfiles test
-fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_read_nfiles.json
+# numjobs read nfiles test
+# fio numjobs_read_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_read_nfiles.json
 
 
-Numjobs write nfiles test
-fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_write_nfiles.json
+# Numjobs write nfiles test
+# fio numjobs_write_nfiles.fio --output-format=json --output=/data/storage_tests/output/numjobs_write_nfiles.json
 
-Iodepth read 1file test
-fio iodepth_read_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_read_1file.json
+# Iodepth read 1file test
+# fio iodepth_read_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_read_1file.json
 
-Iodepth write 1file test
-fio iodepth_write_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_write_1file.json
+# Iodepth write 1file test
+# fio iodepth_write_1file.fio --output-format=json --output=/data/storage_tests/output/iodepth_write_1file.json
 
-Random read test
-fio randread.fio --output-format=json --output=/data/storage_tests/output/randread.json
+# Random read test
+# fio randread.fio --output-format=json --output=/data/storage_tests/output/randread.json
 
-Random write test
-fio randwrite.fio --output-format=json --output=/data/storage_test/output/randwrite.json
+# Random write test
+# fio randwrite.fio --output-format=json --output=/data/storage_test/output/randwrite.json
 
-"""
 
 #write test then read test
 echo "Starting storage tests..."
