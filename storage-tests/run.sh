@@ -10,7 +10,8 @@ echo "Storage test directory set up at /data/storage_tests/output/$GCRNODE/$time
 
 cd /data/storage_tests/
 echo pwd: $(pwd)
-echo
+echo "Current directory contents:"
+ls -l
 
 
 # numjobs read nfiles test
